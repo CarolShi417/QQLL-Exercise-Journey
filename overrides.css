@@ -60,6 +60,12 @@
 .calendar-carol { background: var(--carol-soft); color: #c34f48; }.calendar-carol i { background: var(--carol); }
 .calendar-allen { background: var(--allen-soft); color: #3d7ebf; }.calendar-allen i { background: var(--allen); }
 
+.auth-screen { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; padding: 20px; background: #f7f7f8; }
+.auth-screen.is-hidden { display: none; }
+.auth-card { width: min(100%, 360px); padding: 32px 24px 26px; border: 1px solid var(--line); border-radius: 24px; background: #fff; box-shadow: 0 12px 35px #25232b12; text-align: center; }
+.auth-mark { display: inline-grid; width: 54px; height: 54px; place-items: center; border-radius: 50%; background: #f28b3d; color: #fff; font-size: 13px; font-weight: 700; }
+.auth-card h1 { margin: 19px 0 9px; font-size: 20px; letter-spacing: -.04em; }.auth-card p { margin: 0 0 21px; color: var(--subtle); font-size: 13px; line-height: 1.6; }.auth-card label { display: block; color: var(--ink); font-size: 12px; font-weight: 650; text-align: left; }.auth-card input { width: 100%; height: 46px; margin-top: 8px; padding: 0 11px; border: 1px solid var(--line); border-radius: 11px; outline: none; background: #fafafb; }.auth-card .save-button { margin-top: 15px; }.auth-card .auth-message { min-height: 20px; margin: 13px 0 0; color: #f28b3d; font-size: 12px; }.auth-card .auth-message.is-error { color: #cc5149; }
+
 .bottom-nav {
   position: fixed;
   bottom: max(12px, env(safe-area-inset-bottom));

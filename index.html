@@ -9,6 +9,16 @@
     <link rel="stylesheet" href="overrides.css" />
   </head>
   <body>
+    <section class="auth-screen" id="authScreen" aria-label="登录">
+      <form class="auth-card" id="authForm">
+        <span class="auth-mark">C&A</span>
+        <h1>一起记录每一次运动</h1>
+        <p>输入 Carol 或 Allen 的邮箱，我们会发送一封登录链接。</p>
+        <label for="emailInput">邮箱<input id="emailInput" type="email" autocomplete="email" placeholder="name@example.com" required /></label>
+        <button class="save-button" type="submit">发送登录链接</button>
+        <p class="auth-message" id="authMessage"></p>
+      </form>
+    </section>
     <main class="app-shell">
       <section class="view is-active" id="today" aria-label="本周训练">
         <p class="period" id="weekPeriod"></p>
@@ -76,6 +86,7 @@
       </form>
     </dialog>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="app.js"></script>
   </body>
 </html>
