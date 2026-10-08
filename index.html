@@ -11,12 +11,11 @@
   <body>
     <section class="auth-screen" id="authScreen" aria-label="登录">
       <form class="auth-card" id="authForm">
-        <span class="auth-mark">C&A</span>
-        <h1>一起记录每一次运动</h1>
-        <p>输入 Carol 或 Allen 的邮箱，我们会发送一封登录链接。</p>
-        <label for="emailInput">邮箱<input id="emailInput" type="email" autocomplete="email" placeholder="name@example.com" required /></label>
-        <button class="save-button" type="submit">发送登录链接</button>
-        <p class="auth-message" id="authMessage"></p>
+        <div class="auth-fields">
+          <input id="emailInput" type="email" autocomplete="email" placeholder="邮箱地址" aria-label="邮箱地址" required />
+          <button class="save-button" type="submit">登录</button>
+        </div>
+        <p class="auth-message" id="authMessage">请输入邮箱登录</p>
       </form>
     </section>
     <main class="app-shell">
