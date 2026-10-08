@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f7f7f8" />
+    <title>C&A Exercise Journey</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="overrides.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="view is-active" id="today" aria-label="本周训练">
+        <p class="period" id="weekPeriod"></p>
+        <div class="weekly-comparison">
+          <article class="person-panel carol-panel">
+            <div class="person-top"><span class="avatar">C</span><span>Carol</span></div>
+            <div class="metric"><strong id="carolSessions">0</strong><span>次训练</span></div>
+            <div class="metric calories"><strong id="carolCalories">0</strong><span>周消耗 kcal</span></div>
+          </article>
+          <div class="divider"></div>
+          <article class="person-panel allen-panel">
+            <div class="person-top"><span class="avatar">A</span><span>Allen</span></div>
+            <div class="metric"><strong id="allenSessions">0</strong><span>次训练</span></div>
+            <div class="metric calories"><strong id="allenCalories">0</strong><span>周消耗 kcal</span></div>
+          </article>
+        </div>
+        <button id="openCheckin" class="checkin-button" type="button"><span>＋</span> 新增打卡</button>
+      </section>
+
+      <section class="view" id="records" aria-label="运动记录">
+        <div class="calendar-card">
+          <div class="month-switcher">
+            <button id="previousMonth" type="button" aria-label="上个月">‹</button>
+            <strong id="calendarMonth"></strong>
+            <button id="nextMonth" type="button" aria-label="下个月">›</button>
+          </div>
+          <div class="weekdays"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
+          <div class="calendar" id="calendar"></div>
+        </div>
+        <div class="legend"><span><i class="carol-dot"></i>Carol</span><span><i class="allen-dot"></i>Allen</span><span><i class="both-dot"></i>一起运动</span></div>
+        <div class="day-records" id="dayRecords"><p>点按日期，查看当天记录</p></div>
+      </section>
+
+      <section class="view" id="achievements" aria-label="运动成就">
+        <div class="achievement-card">
+          <div class="achievement-copy"><div class="achievement-profile"><span class="avatar carol-avatar">C</span><strong>Carol <em id="carolLevel">Lv.0</em></strong></div><div class="achievement-progress-copy"><p>累计经验</p><b id="carolProgressText">0 / 100 XP</b></div></div>
+          <div class="progress-track"><div class="carol-progress" id="carolProgress"></div></div>
+        </div>
+        <div class="achievement-card">
+          <div class="achievement-copy"><div class="achievement-profile"><span class="avatar allen-avatar">A</span><strong>Allen <em id="allenLevel">Lv.0</em></strong></div><div class="achievement-progress-copy"><p>累计经验</p><b id="allenProgressText">0 / 100 XP</b></div></div>
+          <div class="progress-track"><div class="allen-progress" id="allenProgress"></div></div>
+        </div>
+        <p class="goal-note">卡路里 ÷ 10 = 经验值。100 XP 升 Lv.1，300 XP 升 Lv.2，600 XP 升 Lv.3。</p>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="页面切换">
+      <button class="nav-item is-active" data-view="today" type="button"><span>⌂</span>今日</button>
+      <button class="nav-item" data-view="records" type="button"><span>□</span>日历</button>
+      <button class="nav-item" data-view="achievements" type="button"><span>★</span>成就</button>
+    </nav>
+
+    <dialog class="checkin-dialog" id="checkinDialog">
+      <form class="checkin-form" id="activityForm">
+        <div class="dialog-top"><strong>新增打卡</strong><button class="close-button" id="closeCheckin" type="button" aria-label="关闭">×</button></div>
+        <div class="person-picker">
+          <label class="person-option is-selected"><input type="radio" name="person" value="Carol" checked /><span class="avatar">C</span>Carol</label>
+          <label class="person-option"><input type="radio" name="person" value="Allen" /><span class="avatar">A</span>Allen</label>
+        </div>
+        <label>运动项目<select id="activity" required><option value="跑步">跑步</option><option value="无氧/力量">无氧/力量</option><option value="游泳">游泳</option><option value="骑行">骑行</option><option value="瑜伽">瑜伽</option></select></label>
+        <label>运动日期<input id="workoutDate" type="date" required /></label>
+        <label>运动时间（分钟）<input id="minutes" type="number" min="1" max="1440" value="30" required /></label>
+        <p class="calorie-preview">预计获得 <strong id="caloriePreview">300</strong> kcal · <strong id="xpPreview">30</strong> XP</p>
+        <button class="save-button" type="submit">保存打卡</button>
+      </form>
+    </dialog>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="app.js"></script>
+  </body>
+</html>

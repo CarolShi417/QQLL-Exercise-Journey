@@ -1,0 +1,79 @@
+/* Final mobile framing adjustments. */
+.checkin-button {
+  background: #f28b3d;
+  box-shadow: 0 5px 14px #f28b3d42;
+}
+
+.achievement-copy em {
+  margin-left: 5px;
+  color: var(--subtle);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.calorie-preview {
+  margin: 4px 0 18px;
+  padding: 12px;
+  border-radius: 11px;
+  background: #f7f7f8;
+  color: var(--subtle);
+  font-size: 12px;
+  text-align: center;
+}
+
+.calorie-preview strong { color: #f28b3d; }
+
+/* Larger avatar placeholders, ready to be replaced by the animal assets later. */
+.person-top {
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.person-panel .avatar {
+  width: 76px;
+  height: 76px;
+  font-size: 25px;
+  box-shadow: 0 4px 0 #d95e57;
+}
+
+.allen-panel .avatar { box-shadow: 0 4px 0 #4f86c0; }
+
+.achievement-copy { align-items: center; }
+.achievement-profile { display: flex; flex: 0 0 76px; flex-direction: column; align-items: center; gap: 7px; }
+.achievement-profile .avatar { width: 58px; height: 58px; font-size: 19px; }
+.achievement-profile strong { font-size: 12px; white-space: nowrap; }
+.achievement-progress-copy { flex: 1; }
+.achievement-progress-copy p { margin: 0 0 5px; color: var(--subtle); font-size: 11px; }
+.achievement-progress-copy b { font-size: 14px; }
+
+/* Calendar cells become compact record cards instead of colour-only dots. */
+.calendar { grid-auto-rows: 66px; gap: 5px 3px; }
+.day { aspect-ratio: auto; align-content: start; justify-items: start; gap: 3px; padding: 5px; border-radius: 10px; font-size: 12px; text-align: left; }
+.day-number { padding-left: 1px; line-height: 1; }
+.day.has-both { background: #f5f3f0; }
+.calendar-entry { display: flex; width: 100%; align-items: center; gap: 2px; overflow: hidden; padding: 2px 3px; border-radius: 5px; font-size: 8px; line-height: 1.15; touch-action: manipulation; user-select: none; }
+.calendar-entry i { display: grid; width: 12px; height: 12px; flex: 0 0 12px; place-items: center; border-radius: 50%; color: #fff; font-size: 7px; font-style: normal; font-weight: 700; }
+.calendar-entry b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 650; }
+.calendar-carol { background: var(--carol-soft); color: #c34f48; }.calendar-carol i { background: var(--carol); }
+.calendar-allen { background: var(--allen-soft); color: #3d7ebf; }.calendar-allen i { background: var(--allen); }
+
+.bottom-nav {
+  position: fixed;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  left: 50%;
+  width: min(calc(100% - 28px), 480px);
+  height: 72px;
+  padding: 7px;
+  transform: translateX(-50%);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: #fffffff2;
+  box-shadow: 0 8px 28px #25232b1a;
+}
+
+@media (min-width: 650px) {
+  .bottom-nav { right: auto; }
+}
