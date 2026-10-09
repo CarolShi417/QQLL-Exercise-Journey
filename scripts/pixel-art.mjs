@@ -101,14 +101,15 @@ const CATS = {
     ],
     palette: { K:'#4a3226', F:'#e8954a', S:'#c4702e', W:'#fffaf2', E:'#79a064', D:'#2b2420', P:'#f2a3a8' },
   },
-  // Allen: long-haired brown tabby with a flat face — small ears, "M" forehead stripes, big copper eyes, cream ruff, striped legs.
+  // Allen: golden-tan Persian with a flat face — small tufted ears, dark stripes converging down the forehead,
+  // big yellow-green eyes, small pinkish nose, cream ruff, darker striped legs.
   allen: {
     rows: [
       '................',
       '.K............K.',
-      '.KSK........KSK.',
-      '.KSFKKKKKKKKFSK.',
-      '.KFSFFSFFSFFSFK.',
+      '.KLK........KLK.',
+      '.KLFKKKKKKKKFLK.',
+      '.KFFFSFSSFSFFFK.',
       '.KFEEFFSSFFEEFK.',
       'KFFEDFFFFFFDEFFK',
       'LFLLFFFNNFFFLLFL',
@@ -117,11 +118,11 @@ const CATS = {
       '.KWWWWWWWWWWWWK.',
       '.KFWWWWWWWWWWFK.',
       '.KFFWWWWWWWWFFK.',
-      '.KFSFWWWWWWFSFK.',
-      '.KFSFKFFFFKFSFK.',
+      '.KSFFWWWWWWFFSK.',
+      '.KSFSKFFFFKSFSK.',
       '..KKKKKKKKKKKKK.',
     ],
-    palette: { K:'#3a3129', F:'#a08e76', S:'#66584a', L:'#c4b49c', W:'#ece5d8', E:'#d0923a', D:'#2a211a', N:'#8a5a4a' },
+    palette: { K:'#3b2e22', F:'#b8996f', S:'#5e4835', L:'#dcc8a6', W:'#f0e8da', E:'#c3bf4c', D:'#241b14', N:'#c98a7e' },
   },
 };
 
