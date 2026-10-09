@@ -14,13 +14,28 @@
 
 页面必须通过 HTTPS 网址访问（Cloudflare Pages、GitHub Pages、Vercel 都可以），直接双击 `index.html` 无法登录。
 
-### 1. 数据库权限（只需做一次）
+### 0. 新建 Supabase 项目
 
-在 Supabase 控制台 **SQL Editor** 里粘贴并运行 `supabase/migrations/20261008000000_secure_workouts.sql`。它会：
+1. 在 [supabase.com](https://supabase.com) 点 **New project**，Region 选 **Southeast Asia (Singapore)** 或 **Northeast Asia (Tokyo)**，离国内近。
+2. 数据库密码设成强密码并保存好（日常用不到，但丢了很麻烦）。
+3. 在 **Project Settings → API Keys** 里拿到项目地址 `https://xxxx.supabase.co` 和 **publishable key**（`sb_publishable_…`）。
+   填进 `app.js` 顶部的 `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY`，并把 `index.html` 里 CSP 的 `connect-src` 两处域名换成新的。
+   **不要用 secret / service_role key。**
+4. **Authentication → URL Configuration** 把 Site URL 设成网站地址，找回密码邮件会跳到这里。
 
-- 新建 `members` 白名单表，只有白名单里的账号能读写记录；
-- 给 `workouts` 开启行级权限（RLS），删除旧策略，未登录用户什么都读不到；
+### 1. 建表和权限
+
+在 **SQL Editor** 里粘贴并运行 `supabase/migrations/20261008000000_secure_workouts.sql`（可重复运行）。它会：
+
+- 创建 `workouts` 记录表和 `members` 白名单表，只有白名单里的账号能读写记录；
+- 开启行级权限（RLS），未登录用户什么都读不到；
 - 卡路里、记录人账号、创建时间由数据库触发器决定，前端改不了；记录不允许修改。
+
+### 搬迁旧项目的记录（可选）
+
+1. 在**旧**项目的 SQL Editor 运行 `supabase/export-old-workouts.sql`，复制结果那一格的全部内容（结果是 NULL 说明没有旧记录，跳过）。
+2. 在**新**项目的 SQL Editor 粘贴运行。SQL Editor 是管理员身份，会保留原来的卡路里和时间。
+3. 搬完后在旧项目关闭注册，或直接删除旧项目。
 
 ### 2. 创建两个账号并关闭注册
 
