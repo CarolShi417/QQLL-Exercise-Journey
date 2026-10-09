@@ -14,7 +14,7 @@ node --test
 npm run build:assets
 ```
 
-改了任何用户可见的文字、或 `scripts/pixel-art.mjs` 里的像素图后都要跑一次。`index.html` 里 `pixel-sprite` 标记之间的图标、`styles.css` 里 `font-faces` 标记之间的字体声明、`icons/pixel/`、`fonts/fusion-pixel-12px-subset.woff2` 都是生成的，不要手改。
+改了任何用户可见的文字、或 `scripts/pixel-art.mjs` 里的像素图后都要跑一次。`index.html` 里 `pixel-sprite` 标记之间的图标、`styles.css` 里 `font-faces` 标记之间的字体声明、`icons/pixel/paw*.svg`、`fonts/fusion-pixel-12px-subset.woff2` 都是生成的，不要手改。
 
 ## 约束与易踩的坑
 
@@ -27,5 +27,5 @@ npm run build:assets
 - 在 `onAuthStateChange` 回调里不要直接 await Supabase 调用（会锁死 auth），用 `setTimeout` 推迟。
 - 等级、连续天数、徽章、每周 Boss 都由 `game.js` 从打卡记录推算，不存数据库。加新玩法时保持这个做法：数据库只存服务器校验过的打卡，前端就没有可以篡改的分数。
 - 像素字体：字号只用 12 / 16 / 24px，其他尺寸在手机上会糊；没有粗体，强调靠颜色和字号。裁剪版字体只含源码里出现过的字，漏跑 `build:assets` 时缺的字会去下载 652KB 的完整字体，不会显示成方块，但会变慢。
-- `icons/cat/` 是两只猫的原始照片，只留在本地（已 gitignore）——仓库和网站都是公开的。像素猫按照片画在 `scripts/pixel-art.mjs` 的 `CATS` 里。
-- 主屏幕图标的源图是 `icons/QL.png`（1254×1254），改完要重新导出 `apple-touch-icon.png`(180)、`icon-192.png`、`icon-512.png`，三个都必须是不透明的正方形（iOS 会把透明部分填成黑色）。iOS 在添加到主屏幕时缓存图标和名称，换图后要删掉主屏幕图标重新添加。
+- 猫咪头像 `icons/pixel/cat-carol.svg`、`cat-allen.svg` 是用户提供的 32×32 手绘像素画，**不是生成的**，脚本不会碰它们；替换时保持文件名不变（注意别带空格）、只用 `<rect>`，不要有脚本或外链。`icons/cat/` 是猫的原始照片，只留在本地（已 gitignore）——仓库和网站都是公开的。
+- 主屏幕图标的源图是 `icons/QL.png`（目前 1024×1024，内容其实是 JPEG，扩展名是 png，不影响导出），改完要重新导出 `apple-touch-icon.png`(180)、`icon-192.png`、`icon-512.png`，三个都必须是不透明的正方形（iOS 会把透明部分填成黑色）。iOS 在添加到主屏幕时缓存图标和名称，换图后要删掉主屏幕图标重新添加。
