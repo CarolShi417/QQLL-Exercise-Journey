@@ -1,0 +1,44 @@
+# Copy to .github/workflows/backup.yml in a PRIVATE repository together with export.sql.
+# Never put it in the public app repository: the backup contains all workout records.
+# Needs one secret, BACKUP_DB_URL (see backup/README.md).
+name: Daily backup
+
+on:
+  schedule:
+    - cron: '0 19 * * *'   # 03:00 Beijing time
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency: backup
+
+jobs:
+  backup:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Export workouts
+        env:
+          BACKUP_DB_URL: ${{ secrets.BACKUP_DB_URL }}
+        run: |
+          mkdir -p backups
+          psql "$BACKUP_DB_URL" -X -A -t -q -v ON_ERROR_STOP=1 -f export.sql > raw.json
+          # Refuse to overwrite the last good backup with anything that isn't a workouts list.
+          jq -e '.workouts | type == "array"' raw.json > /dev/null
+          jq . raw.json > backups/latest.json
+          rm raw.json
+          echo "Backed up $(jq '.workouts | length' backups/latest.json) records"
+
+      # Every run commits (exported_at changes), so git history keeps one snapshot per day,
+      # and the repository stays active enough that GitHub never disables the schedule.
+      - name: Commit
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add backups/latest.json
+          git diff --cached --quiet && exit 0
+          git commit -m "backup $(date -u +%F)"
+          git push
