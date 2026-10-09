@@ -58,6 +58,8 @@ function pixelBurst(host) {
   }
   host.append(burst); setTimeout(() => burst.remove(), 1000);
 }
+function showSplash() { $('#splash').classList.remove('is-done'); }
+function hideSplash() { $('#splash').classList.add('is-done'); }
 function setAuthMessage(message, isError = false) { const element = $('#authMessage'); element.textContent = message; element.classList.toggle('is-error', isError); }
 function showAuthScreen() { $('#authScreen').classList.remove('is-hidden'); }
 function hideAuthScreen() { $('#authScreen').classList.add('is-hidden'); }
@@ -85,11 +87,11 @@ function bossCardHtml(boss, wins) {
   const scale = Math.max(boss.hp, boss.damage.Carol + boss.damage.Allen);
   const carolShare = boss.damage.Carol / scale * 100;
   const allenShare = boss.damage.Allen / scale * 100;
-  const status = boss.defeated ? `已击败 · 本周还剩 ${boss.daysLeft} 天` : boss.daysLeft ? `剩余 HP ${number(boss.remaining)} / ${number(boss.hp)} · 还剩 ${boss.daysLeft} 天` : `剩余 HP ${number(boss.remaining)} · 今天是最后一天`;
+  const status = boss.defeated ? `已赶走 · 本周还剩 ${boss.daysLeft} 天` : boss.daysLeft ? `剩余 HP ${number(boss.remaining)} / ${number(boss.hp)} · 还剩 ${boss.daysLeft} 天` : `剩余 HP ${number(boss.remaining)} · 今天是最后一天`;
   return `<article class="habit-card boss-card ${boss.defeated ? 'is-defeated' : ''}">
-    <header class="habit-head"><span class="habit-tile boss-tile">${icon(boss.defeated ? 'crown' : 'sword')}</span><div class="habit-title"><strong>本周 Boss · ${boss.name}</strong><span>${status}</span></div></header>
-    <div class="boss-bar" role="img" aria-label="Carol 造成 ${boss.damage.Carol} 伤害，Allen 造成 ${boss.damage.Allen} 伤害，共 ${boss.hp} HP"><span class="boss-hit is-carol" data-share="${carolShare}"></span><span class="boss-hit is-allen" data-share="${allenShare}"></span></div>
-    <footer class="habit-foot"><span><i class="dot is-carol"></i> Carol ${number(boss.damage.Carol)}</span><span><i class="dot is-allen"></i> Allen ${number(boss.damage.Allen)}</span><span class="boss-wins">已击败 ${wins} 只</span></footer>
+    <header class="habit-head"><span class="habit-tile boss-tile">${icon(boss.defeated ? 'crown' : 'sword')}</span><div class="habit-title"><strong>本周天敌 · ${boss.name}</strong><span>${status}</span></div></header>
+    <div class="boss-bar" role="img" aria-label="Carol 造成 ${boss.damage.Carol} 伤害，Allen 造成 ${boss.damage.Allen} 伤害，天敌共 ${boss.hp} HP"><span class="boss-hit is-carol" data-share="${carolShare}"></span><span class="boss-hit is-allen" data-share="${allenShare}"></span></div>
+    <footer class="habit-foot"><span><i class="dot is-carol"></i> Carol ${number(boss.damage.Carol)}</span><span><i class="dot is-allen"></i> Allen ${number(boss.damage.Allen)}</span><span class="boss-wins">已赶走 ${wins} 个</span></footer>
   </article>`;
 }
 function renderHome() {
@@ -101,13 +103,13 @@ function renderHome() {
   const days = G.heatmapDays(today, HEATMAP_WEEKS);
   const { monday, sunday } = Q.weekRange(today);
   const format = new Intl.DateTimeFormat('zh-CN', { month:'numeric', day:'numeric' });
-  $('#weekPeriod').textContent = `${format.format(monday)} — ${format.format(sunday)} 本周`;
+  $('#weekPeriod').textContent = `${me ? `嗨，${me.person} 喵 · ` : ''}${format.format(monday)} — ${format.format(sunday)}`;
 
   const cards = [bossCardHtml(G.weeklyBoss(entries, today), G.bossWins(entries, today))];
   Q.PEOPLE.forEach((person) => {
     const activeDays = G.personDays(entries, person);
     cards.push(habitCardHtml({
-      scope:`is-${person.toLowerCase()}`, tile:person[0], checkin:person,
+      scope:`is-${person.toLowerCase()}`, tile:Q.catHtml(person), checkin:person,
       title:`${person} <em>${personTitle(person)}</em>`,
       subtitle:`本周 ${weekSessions[person]} 次 · ${number(weekCalories[person])} kcal`,
       gridLabel:`${person} 最近 ${HEATMAP_WEEKS} 周的运动热力图，共 ${activeDays.size} 天有运动`,
@@ -172,7 +174,7 @@ function levelCardHtml(person) {
   const level = Q.currentLevel(xp);
   const share = (xp - level.start) / (level.next - level.start) * 100;
   return `<article class="card level-card is-${person.toLowerCase()}">
-    <div class="level-row"><span class="habit-tile">${person[0]}</span><div class="level-copy"><strong>${person} <em>Lv.${level.level}</em></strong><span>${G.levelTitle(level.level)}</span></div><b>${number(xp)} / ${number(level.next)} XP</b></div>
+    <div class="level-row"><span class="habit-tile">${Q.catHtml(person)}</span><div class="level-copy"><strong>${person} <em>Lv.${level.level}</em></strong><span>${G.levelTitle(level.level)}</span></div><b>${number(xp)} / ${number(level.next)} XP</b></div>
     <div class="progress-track"><div class="progress-bar" data-share="${share}"></div></div>
     <p class="level-next">再获得 ${number(level.next - xp)} XP 升到 Lv.${level.level + 1} · ${G.levelTitle(level.level + 1)}</p>
   </article>`;
@@ -207,7 +209,7 @@ function progressSnapshot() {
 }
 function celebrationsBetween(before, after) {
   const messages = [];
-  if (!before.boss.defeated && after.boss.defeated) messages.push(`击败了本周 Boss「${after.boss.name}」`);
+  if (!before.boss.defeated && after.boss.defeated) messages.push(`赶走了本周天敌「${after.boss.name}」`);
   Q.PEOPLE.forEach((person) => { if (after.levels[person] > before.levels[person]) messages.push(`${person} 升到 Lv.${after.levels[person]} · ${G.levelTitle(after.levels[person])}`); });
   // One toast per owner, however many badges they just earned, so a big save doesn't queue a minute of toasts.
   Object.entries(after.badges).forEach(([owner, names]) => {
@@ -277,25 +279,26 @@ function subscribeToChanges() {
 async function startAuthenticatedApp(user) {
   if (me) return;
   const current = ++session;
+  showSplash();
   try {
     const { data:member, error } = await supabaseClient.from('members').select('person').eq('user_id', user.id).maybeSingle();
     if (error) throw error;
     if (current !== session) return;
-    if (!member) { await supabaseClient.auth.signOut(); setAuthMessage('这个账号没有使用权限', true); return; }
+    if (!member) { await supabaseClient.auth.signOut(); hideSplash(); setAuthMessage('这个账号没有使用权限', true); return; }
     me = { id:user.id, person:member.person };
     await loadRemoteRecords();
     if (current !== session) return;
-    hideAuthScreen(); resetCheckinForm(); subscribeToChanges();
+    hideAuthScreen(); resetCheckinForm(); subscribeToChanges(); hideSplash();
   } catch (error) {
     if (current !== session) return;
-    me = null; showAuthScreen(); setAuthMessage(`无法读取云端记录：${errorText(error)}`, true);
+    me = null; showAuthScreen(); hideSplash(); setAuthMessage(`无法读取云端记录：${errorText(error)}`, true);
   }
 }
 function stopApp() {
   session += 1; me = null; entries = []; selectedDate = null; badgeOwner = null; freshPixel = null; clearTimeout(reloadTimer);
   if (realtimeChannel) { supabaseClient.removeChannel(realtimeChannel); realtimeChannel = null; }
   if ($('#checkinDialog').open) $('#checkinDialog').close();
-  render(); showView('today'); showAuthScreen();
+  render(); showView('today'); showAuthScreen(); hideSplash();
 }
 function exportRecords() {
   const blob = new Blob([JSON.stringify({ exported_at:new Date().toISOString(), workouts:entries.map(({ person, activity, minutes, calories, date }) => ({ person, activity, minutes, calories, date })) }, null, 2)], { type:'application/json' });
@@ -366,7 +369,7 @@ function bindUi() {
 function boot() {
   try { LEGACY_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key)); } catch { /* storage unavailable */ }
   render();
-  if (!window.supabase) { showAuthScreen(); $('#authForm button').disabled = true; setAuthMessage('登录组件加载失败，请检查网络后刷新页面', true); return; }
+  if (!window.supabase) { showAuthScreen(); hideSplash(); $('#authForm button').disabled = true; setAuthMessage('登录组件加载失败，请检查网络后刷新页面', true); return; }
   supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, { auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:false } });
   bindUi();
   // Defer Supabase calls out of the auth callback: awaiting them inside it can deadlock the auth lock.

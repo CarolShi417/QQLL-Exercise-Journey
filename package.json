@@ -1,0 +1,13 @@
+{
+  "name": "qqll-exercise-journey",
+  "private": true,
+  "description": "Static site; these dev dependencies only regenerate the pixel icons and the font subset.",
+  "scripts": {
+    "test": "node --test",
+    "build:assets": "node scripts/pixel-art.mjs && node scripts/build-font.mjs"
+  },
+  "devDependencies": {
+    "pixelarticons": "2.4.1",
+    "subset-font": "2.9.0"
+  }
+}

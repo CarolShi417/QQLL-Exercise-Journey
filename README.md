@@ -4,8 +4,9 @@
 
 ## 已有功能
 
-- 首页三张卡片（Carol / Allen / 一起运动）：最近 22 周的像素热力图、本周次数和卡路里、连续打卡天数
-- 每周情侣 Boss：3,000 HP，两人本周消耗的卡路里合起来就是伤害，周一刷新
+- 像素风猫咪主题：照着两只猫画的像素头像、像素中文字体、猫爪热力图，加载时有小猫跳跳的过渡动画
+- 首页三张卡片（Carol / Allen / 一起运动）：最近 22 周的猫爪热力图、本周次数和卡路里、连续打卡天数
+- 每周猫咪天敌（吸尘器魔王、洗澡盆怪…）：3,000 HP，两人本周消耗的卡路里合起来就是伤害，周一刷新
 - 记录 Carol 或 Allen 的运动项目与时长（可以替对方打卡），卡路里由服务器计算
 - 像素风月历；当天记录列表里可以删除自己记的、或记在自己名下的记录
 - 卡路里 ÷ 10 = XP，等级没有上限（Lv.n 需要 100 ×（1 + … + n）XP），每级有称号
@@ -76,5 +77,13 @@ select id, 'Allen' from auth.users where email = 'allen@example.com';
 ```bash
 node --test
 ```
+
+改了界面文字或像素图之后，重新生成字体子集和图标（需要先 `npm install`）：
+
+```bash
+npm run build:assets
+```
+
+素材授权：像素字体 [Fusion Pixel Font](https://github.com/TakWolf/fusion-pixel-font)（OFL，见 `fonts/FusionPixel-OFL.txt`），图标 [pixelarticons](https://github.com/halfmage/pixelarticons)（MIT）。
 
 本地预览需要一个静态服务器（例如 `npx http-server`），然后在浏览器打开它给出的地址。

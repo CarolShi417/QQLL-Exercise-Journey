@@ -1,0 +1,4 @@
+node_modules/
+# Reference photos of our cats stay local — the repository is public.
+cat-photos/
+icons/cat/

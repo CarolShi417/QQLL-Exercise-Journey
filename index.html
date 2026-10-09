@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="dark light" />
-    <meta name="theme-color" content="#15141a" media="(prefers-color-scheme: dark)" />
-    <meta name="theme-color" content="#f6f5f2" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#17161f" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f3f2fa" media="(prefers-color-scheme: light)" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://pnjwkpxmkyoutpazlfuf.supabase.co wss://pnjwkpxmkyoutpazlfuf.supabase.co; object-src 'none'; base-uri 'none'; form-action 'self'" />
     <meta name="referrer" content="no-referrer" />
     <title>C&A Exercise Journey</title>
@@ -16,47 +16,57 @@
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
     <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="preload" href="fonts/nunito-latin-800.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="fonts/fusion-pixel-12px-subset.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <!-- Tabler Icons (MIT)，用 <svg><use href="#i-…"/></svg> 引用 -->
-    <svg class="icon-sprite" aria-hidden="true">
-      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5l0 14"/><path d="M5 12l14 0"/></symbol>
-      <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 10.941c2.333 -3.308 .167 -7.823 -1 -8.941c0 3.395 -2.235 5.299 -3.667 6.706c-1.43 1.408 -2.333 3.294 -2.333 5.588c0 3.704 3.134 6.706 7 6.706c3.866 0 7 -3.002 7 -6.706c0 -1.712 -1.232 -4.403 -2.333 -5.588c-2.084 3.353 -3.257 3.353 -4.667 2.235"/></symbol>
-      <symbol id="i-calendar" viewBox="0 0 24 24"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M4 11h16"/><path d="M11 15h1"/><path d="M12 15v3"/></symbol>
-      <symbol id="i-calendar-month" viewBox="0 0 24 24"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M4 11h16"/><path d="M8 14v4"/><path d="M12 14v4"/><path d="M16 14v4"/></symbol>
-      <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7l16 0"/><path d="M10 11l0 6"/><path d="M14 11l0 6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/></symbol>
-      <symbol id="i-home" viewBox="0 0 24 24"><path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/></symbol>
-      <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 21l8 0"/><path d="M12 17l0 4"/><path d="M7 4l10 0"/><path d="M17 4v8a5 5 0 0 1 -10 0v-8"/><path d="M3 9a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M17 9a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/></symbol>
-      <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6l-12 12"/><path d="M6 6l12 12"/></symbol>
-      <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="M15 6l-6 6l6 6"/></symbol>
-      <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="M9 6l6 6l-6 6"/></symbol>
-      <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572"/></symbol>
-      <symbol id="i-logout" viewBox="0 0 24 24"><path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2"/><path d="M9 12h12l-3 -3"/><path d="M18 15l3 -3"/></symbol>
-      <symbol id="i-download" viewBox="0 0 24 24"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/><path d="M7 11l5 5l5 -5"/><path d="M12 4l0 12"/></symbol>
-      <symbol id="i-run" viewBox="0 0 24 24"><path d="M11.007 5a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M4 17l5 1l.75 -1.5"/><path d="M15 21v-4l-4 -3l1 -6"/><path d="M7 12v-3l5 -1l3 3l3 1"/></symbol>
-      <symbol id="i-barbell" viewBox="0 0 24 24"><path d="M2 12h1"/><path d="M6 8h-2a1 1 0 0 0 -1 1v6a1 1 0 0 0 1 1h2"/><path d="M6 7v10a1 1 0 0 0 1 1h1a1 1 0 0 0 1 -1v-10a1 1 0 0 0 -1 -1h-1a1 1 0 0 0 -1 1"/><path d="M9 12h6"/><path d="M15 7v10a1 1 0 0 0 1 1h1a1 1 0 0 0 1 -1v-10a1 1 0 0 0 -1 -1h-1a1 1 0 0 0 -1 1"/><path d="M18 8h2a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-2"/><path d="M22 12h-1"/></symbol>
-      <symbol id="i-swimming" viewBox="0 0 24 24"><path d="M15 9a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M6 11l4 -2l3.5 3l-1.5 2"/><path d="M3 16.75a2.4 2.4 0 0 0 1 .25a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 1 -.25"/></symbol>
-      <symbol id="i-bike" viewBox="0 0 24 24"><path d="M2 18a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/><path d="M16 18a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/><path d="M12 19v-4l-3 -3l5 -4l2 3h3"/><path d="M13.007 5a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/></symbol>
-      <symbol id="i-yoga" viewBox="0 0 24 24"><path d="M4 20h4l1.5 -3"/><path d="M17 20l-1 -5h-5l1 -7"/><path d="M4 10l4 -1l4 -1l4 1.5l4 1.5"/><path d="M10.007 5a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/></symbol>
-      <symbol id="i-sword" viewBox="0 0 24 24"><path d="M20 4v5l-9 7l-4 4l-3 -3l4 -4l7 -9l5 0"/><path d="M6.5 11.5l6 6"/></symbol>
-      <symbol id="i-award" viewBox="0 0 24 24"><path d="M6 9a6 6 0 1 0 12 0a6 6 0 1 0 -12 0"/><path d="M12 15l3.4 5.89l1.598 -3.233l3.598 .232l-3.4 -5.889"/><path d="M6.802 12l-3.4 5.89l3.598 -.233l1.598 3.232l3.4 -5.889"/></symbol>
-      <symbol id="i-medal" viewBox="0 0 24 24"><path d="M12 4v3m-4 -3v6m8 -6v6"/><path d="M12 18.5l-3 1.5l.5 -3.5l-2 -2l3 -.5l1.5 -3l1.5 3l3 .5l-2 2l.5 3.5l-3 -1.5"/></symbol>
-      <symbol id="i-crown" viewBox="0 0 24 24"><path d="M12 6l4 6l5 -4l-2 10h-14l-2 -10l5 4l4 -6"/></symbol>
-      <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11"/></symbol>
-      <symbol id="i-heart-handshake" viewBox="0 0 24 24"><path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572"/><path d="M12 6l-3.293 3.293a1 1 0 0 0 0 1.414l.543 .543c.69 .69 1.81 .69 2.5 0l1 -1a3.182 3.182 0 0 1 4.5 0l2.25 2.25"/><path d="M12.5 15.5l2 2"/><path d="M15 13l2 2"/></symbol>
-      <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873l-6.158 -3.245"/></symbol>
-      <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 5a5 5 0 0 1 7 0a5 5 0 0 0 7 0v9a5 5 0 0 1 -7 0a5 5 0 0 0 -7 0v-9"/><path d="M5 21v-7"/></symbol>
-      <symbol id="i-target" viewBox="0 0 24 24"><path d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0"/><path d="M7 12a5 5 0 1 0 10 0a5 5 0 1 0 -10 0"/><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/></symbol>
-      <symbol id="i-lock" viewBox="0 0 24 24"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6"/><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0"/><path d="M8 11v-4a4 4 0 1 1 8 0v4"/></symbol>
+    <!-- pixel-sprite:start -->
+    <!-- 生成文件：npm run build:assets。图标来自 pixelarticons (MIT)，paw/run/barbell/bike 为自绘 -->
+    <svg class="icon-sprite" aria-hidden="true" shape-rendering="crispEdges">
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M13 11h7v2h-7v7h-2v-7H4v-2h7V4h2v7Z"/></symbol>
+      <symbol id="i-flame" viewBox="0 0 24 24"><path d="M9 2h2v4H9zM7 6h2v2H7zM5 8h2v2H5zm8 2h2v2h-2zm2-2h2v2h-2zm2 2h2v2h-2zm2 2h2v6h-2zM3 10h2v8H3zm8-4h2v4h-2zm6 12h2v2h-2zM7 20h10v2H7zm-2-2h2v2H5zm4-2h6v4H9z"/><path d="M11 14h2v3h-2z"/></symbol>
+      <symbol id="i-calendar" viewBox="0 0 24 24"><path d="M5 4h14v2H5zm0 16h14v2H5zM3 10h2v10H3zm0-4h2v2H3zm16 0h2v2h-2zm0 4h2v10h-2zM3 8h18v2H3zm12-6h2v2h-2zM7 2h2v2H7z"/></symbol>
+      <symbol id="i-calendar-month" viewBox="0 0 24 24"><path d="M5 4h14v2H5zm0 16h14v2H5zM3 10h2v10H3zm0-4h2v2H3zm16 0h2v2h-2zm0 4h2v10h-2zM3 8h18v2H3zm12-6h2v2h-2zM7 2h2v2H7zm0 10h10v2H7zm0 4h10v2H7z"/></symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24"><path d="M18 22H6V20H18V22ZM9 6H15V4H17V6H22V8H20V20H18V8H6V20H4V8H2V6H7V4H9V6ZM15 4H9V2H15V4Z"/></symbol>
+      <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 20h16v2H4zm16-10h2v10h-2zM2 10h2v10H2zm2-2h2v2H4zm2-2h2v2H6zm2-2h2v2H8zm2-2h4v2h-4zm4 2h2v2h-2zm2 2h2v2h-2zm2 2h2v2h-2zM8 14h2v6H8zm2-2h4v2h-4zm4 2h2v6h-2z"/></symbol>
+      <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M16 17H13V19H15V21H9V19H11V17H8V15H16V17ZM18 5H22V11H20V7H18V11H20V13H18V15H16V5H8V15H6V13H4V11H6V7H4V11H2V5H6V3H18V5Z"/></symbol>
+      <symbol id="i-x" viewBox="0 0 24 24"><path d="M7 19H5V17H7V19ZM19 19H17V17H19V19ZM9 15V17H7V15H9ZM17 17H15V15H17V17ZM11 15H9V13H11V15ZM15 15H13V13H15V15ZM13 13H11V11H13V13ZM11 11H9V9H11V11ZM15 11H13V9H15V11ZM9 9H7V7H9V9ZM17 9H15V7H17V9ZM7 7H5V5H7V7ZM19 7H17V5H19V7Z"/></symbol>
+      <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="M8 13v-2h2v2H8Zm2-2V9h2v2h-2Zm0 4v-2h2v2h-2Zm2-6V7h2v2h-2Zm0 8v-2h2v2h-2Zm2-10V5h2v2h-2Zm0 12v-2h2v2h-2Z"/></symbol>
+      <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="M16 13v-2h-2v2h2Zm-2-2V9h-2v2h2Zm0 4v-2h-2v2h2Zm-2-6V7h-2v2h2Zm0 8v-2h-2v2h2ZM10 7V5H8v2h2Zm0 12v-2H8v2h2Z"/></symbol>
+      <symbol id="i-heart" viewBox="0 0 24 24"><path d="M13 22h-2v-2h2v2Zm-2-2H9v-2h2v2Zm4 0h-2v-2h2v2Zm-6-2H7v-2h2v2Zm8 0h-2v-2h2v2ZM7 16H5v-2h2v2Zm12 0h-2v-2h2v2ZM5 14H3v-2h2v2Zm16 0h-2v-2h2v2ZM3 12H1V6h2v6Zm20 0h-2V6h2v6ZM13 8h-2V6h2v2ZM5 6H3V4h2v2Zm6 0H9V4h2v2Zm4 0h-2V4h2v2Zm6 0h-2V4h2v2ZM9 4H5V2h4v2Zm10 0h-4V2h4v2Z"/></symbol>
+      <symbol id="i-logout" viewBox="0 0 24 24"><path d="M8 11h12v2H8zm8-2h2v2h-2z"/><path d="M14 7h2v10h-2zm2 6h2v2h-2zM6 2h12v2H6zm0 18h12v2H6zM4 4h2v16H4zm14 0h2v3h-2zm0 13h2v3h-2z"/></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4h-2v-4zm-2 4v2H5v-2zM5 15v4H3v-4zm8-12v14h-2V3z"/><path d="M7 11v2h10v-2zm2 2v2h2v-2zm4 0v2h2v-2z"/><path d="M15 11v2h2v-2z"/></symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24"><path d="M5 8h14v2H5zm0 12h14v2H5zM3 10h2v10H3zm16 0h2v10h-2zM7 4h2v4H7zm2-2h6v2H9zm6 2h2v4h-2z"/></symbol>
+      <symbol id="i-flag" viewBox="0 0 24 24"><path d="M4 2h2v20H4z"/><path d="M4 4h16v2H4zm12 2h2v2h-2zm-2 2h2v2h-2zm2 2h2v2h-2zM4 12h16v2H4z"/></symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24"><path d="M18 22H8v-2h10v2ZM8 20H6v-2h2v2Zm12 0h-2v-2h2v2ZM6 18H4v-2h2v2Zm16 0h-2v-4h-2v-2h2v-2h2v8ZM4 16H2V6h2v10Zm14 0h-6v-2h6v2Zm-6-2h-2v-2h2v2Zm-2-2H8V6h2v6ZM6 6H4V4h2v2Zm8-2h-2v2h-2V4H6V2h8v2Z"/></symbol>
+      <symbol id="i-shield" viewBox="0 0 24 24"><path d="M4 2h16v2H4zM2 4h2v10H2zm18 0h2v10h-2zM4 14h2v2H4zm2 2h2v2H6zm4 4h4v2h-4zm10-6h-2v2h2zm-2 2h-2v2h2zm-2 2h-2v2h2zm-6 0H8v2h2z"/></symbol>
+      <symbol id="i-zap" viewBox="0 0 24 24"><path d="M4 13h8v6h2v2h-2v2h-2v-8H2v-4h2v2Zm12 6h-2v-2h2v2Zm2-2h-2v-2h2v2Zm2-2h-2v-2h2v2Zm-6-6h8v4h-2v-2h-8V5h-2V3h2V1h2v8Zm-8 2H4V9h2v2Zm2-2H6V7h2v2Zm2-2H8V5h2v2Z"/></symbol>
+      <symbol id="i-star" viewBox="0 0 24 24"><path d="M5 20H8V22H3V16H5V20ZM21 22H16V20H19V16H21V22ZM10 20H8V18H10V20ZM16 20H14V18H16V20ZM14 18H10V16H14V18ZM7 16H5V13H7V16ZM19 16H17V13H19V16ZM5 13H3V11H5V13ZM21 13H19V11H21V13ZM9 9H3V11H1V7H9V9ZM23 11H21V9H15V7H23V11ZM11 7H9V3H11V7ZM15 7H13V3H15V7ZM13 3H11V1H13V3Z"/></symbol>
+      <symbol id="i-users" viewBox="0 0 24 24"><path d="M5 2h6v2H5zm10 0h4v2h-4zM5 10h6v2H5zm10 0h4v2h-4zm4-6h2v6h-2zm-8 0h2v6h-2zM3 4h2v6H3zM0 18h2v4H0zm14 0h2v4h-2zm8 0h2v4h-2zM4 14h8v2H4zm12 0h4v2h-4zM2 16h2v2H2zm10 0h2v2h-2zm8 0h2v2h-2z"/></symbol>
+      <symbol id="i-sword" viewBox="0 0 24 24"><path d="M11 2h2v2h-2zM9 4h2v12H9zm4 0h2v12h-2zM7 16h10v2H7zm4 2h2v4h-2z"/></symbol>
+      <symbol id="i-crown" viewBox="0 0 24 24"><path d="M3 3h2v12H3zm16 0h2v12h-2zm-8 0h2v2h-2zM9 5h2v2H9zM5 5h2v2H5z"/><path d="M3 3h2v2H3zm4 4h2v2H7zm6-2h2v2h-2zm2 2h2v2h-2zm2-2h2v2h-2zM5 15h14v2H5zm-2 4h18v2H3z"/></symbol>
+      <symbol id="i-swim" viewBox="0 0 24 24"><path d="M2 18h4v-2H2zm0-6h4v-2H2zm0-6h4V4H2zm4 14h4v-2H6zm0-6h4v-2H6zm0-6h4V6H6zm4 10h4v-2h-4zm0-6h4v-2h-4zm0-6h4V4h-4zm4 14h4v-2h-4zm0-6h4v-2h-4zm0-6h4V6h-4zm4 10h4v-2h-4zm0-6h4v-2h-4zm0-6h4V4h-4z"/></symbol>
+      <symbol id="i-yoga" viewBox="0 0 24 24"><path d="M10 2h4v4h-4zM7 7h10v2H7zm2 2h2v7H9zm4 0h2v7h-2zm-4 7h2v6H9zm4 0h2v6h-2zm-2-2h2v2h-2zM5 5h2v2H5zM3 3h2v2H3zm14 2h2v2h-2zm2-2h2v2h-2z"/></symbol>
+      <symbol id="i-paw" viewBox="0 0 24 24"><path d="M6 2h4v2h-4zM14 2h4v2h-4zM4 4h6v2h-6zM14 4h6v2h-6zM4 6h6v2h-6zM14 6h6v2h-6zM0 8h4v2h-4zM20 8h4v2h-4zM0 10h4v2h-4zM8 10h8v2h-8zM20 10h4v2h-4zM0 12h4v2h-4zM6 12h12v2h-12zM20 12h4v2h-4zM4 14h16v2h-16zM2 16h20v2h-20zM2 18h20v2h-20zM4 20h16v2h-16z"/></symbol>
+      <symbol id="i-run" viewBox="0 0 24 24"><path d="M16 0h4v2h-4zM16 2h4v2h-4zM10 4h8v2h-8zM8 6h2v2h-2zM12 6h4v2h-4zM18 6h2v2h-2zM6 8h2v2h-2zM12 8h4v2h-4zM20 8h2v2h-2zM12 10h4v2h-4zM10 12h2v2h-2zM16 12h2v2h-2zM8 14h2v2h-2zM18 14h2v2h-2zM6 16h2v2h-2zM18 16h4v2h-4zM4 18h4v2h-4z"/></symbol>
+      <symbol id="i-barbell" viewBox="0 0 24 24"><path d="M0 4h4v2h-4zM20 4h4v2h-4zM0 6h4v2h-4zM6 6h2v2h-2zM16 6h2v2h-2zM20 6h4v2h-4zM0 8h4v2h-4zM6 8h2v2h-2zM16 8h2v2h-2zM20 8h4v2h-4zM0 10h24v2h-24zM0 12h4v2h-4zM6 12h2v2h-2zM16 12h2v2h-2zM20 12h4v2h-4zM0 14h4v2h-4zM6 14h2v2h-2zM16 14h2v2h-2zM20 14h4v2h-4zM0 16h4v2h-4zM20 16h4v2h-4z"/></symbol>
+      <symbol id="i-bike" viewBox="0 0 24 24"><path d="M4 4h4v2h-4zM16 4h4v2h-4zM6 6h2v2h-2zM18 6h2v2h-2zM6 8h14v2h-14zM6 10h2v2h-2zM16 10h2v2h-2zM2 12h6v2h-6zM16 12h6v2h-6zM0 14h2v2h-2zM8 14h2v2h-2zM14 14h2v2h-2zM22 14h2v2h-2zM0 16h2v2h-2zM4 16h2v2h-2zM8 16h8v2h-8zM18 16h2v2h-2zM22 16h2v2h-2zM0 18h2v2h-2zM8 18h2v2h-2zM14 18h2v2h-2zM22 18h2v2h-2zM2 20h6v2h-6zM16 20h6v2h-6z"/></symbol>
     </svg>
+    <!-- pixel-sprite:end -->
+
+    <div class="splash" id="splash" role="status" aria-live="polite">
+      <div class="splash-inner">
+        <div class="splash-cats"><img class="sprite" src="icons/pixel/cat-carol.svg" alt="" width="64" height="64" /><img class="sprite" src="icons/pixel/cat-allen.svg" alt="" width="64" height="64" /></div>
+        <div class="splash-paws" aria-hidden="true"><svg class="icon"><use href="#i-paw"/></svg><svg class="icon"><use href="#i-paw"/></svg><svg class="icon"><use href="#i-paw"/></svg><svg class="icon"><use href="#i-paw"/></svg></div>
+        <p>加载中…</p>
+      </div>
+    </div>
 
     <section class="auth-screen" id="authScreen" aria-label="登录">
       <form class="auth-card" id="authForm">
         <img class="auth-logo" src="icons/apple-touch-icon.png" alt="" width="72" height="72" />
         <h1 class="auth-title">QQLL</h1>
-        <p class="auth-subtitle">两个人的运动打卡</p>
+        <p class="auth-subtitle">两只猫的运动打卡</p>
         <div class="auth-fields">
           <input id="emailInput" type="email" autocomplete="username" placeholder="邮箱地址" aria-label="邮箱地址" required />
           <input id="passwordInput" type="password" autocomplete="current-password" placeholder="密码" aria-label="密码" required />
@@ -89,7 +99,7 @@
           <div class="weekdays"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
           <div class="calendar" id="calendar"></div>
         </div>
-        <div class="legend"><span><i class="dot is-carol"></i>Carol</span><span><i class="dot is-allen"></i>Allen</span><span>颜色越深运动越多</span></div>
+        <div class="legend"><span><i class="dot is-carol"></i>Carol</span><span><i class="dot is-allen"></i>Allen</span><span><svg class="icon"><use href="#i-paw"/></svg>颜色越深运动越多</span></div>
         <div class="day-records" id="dayRecords"><p>点按日期，查看当天记录</p></div>
       </section>
 
@@ -104,7 +114,7 @@
           </div>
         </div>
         <div class="badge-grid" id="badgeGrid"></div>
-        <p class="goal-note">卡路里 ÷ 10 = 经验值。第 n 级需要 100 ×（1 + 2 + … + n）XP：Lv.1 = 100，Lv.4 = 1,000，Lv.10 = 5,500，没有上限。每周 Boss 有 3,000 HP，两个人本周消耗的卡路里合起来就是伤害，周一刷新。</p>
+        <p class="goal-note">卡路里 ÷ 10 = 经验值。第 n 级需要 100 ×（1 + 2 + … + n）XP：Lv.1 = 100，Lv.4 = 1,000，Lv.10 = 5,500，没有上限。每周会来一个猫咪天敌，3,000 HP，两个人本周消耗的卡路里合起来就是伤害，周一刷新。</p>
         <div class="card account-card">
           <p id="accountInfo"></p>
           <button class="link-button" id="exportRecords" type="button"><svg class="icon"><use href="#i-download"/></svg>导出全部记录（JSON）</button>
@@ -123,8 +133,8 @@
       <form class="checkin-form" id="activityForm">
         <div class="dialog-top"><strong>新增打卡</strong><button class="icon-button" id="closeCheckin" type="button" aria-label="关闭"><svg class="icon"><use href="#i-x"/></svg></button></div>
         <div class="person-picker">
-          <label class="person-option is-carol is-selected"><input type="radio" name="person" value="Carol" checked /><span class="habit-tile">C</span>Carol</label>
-          <label class="person-option is-allen"><input type="radio" name="person" value="Allen" /><span class="habit-tile">A</span>Allen</label>
+          <label class="person-option is-carol is-selected"><input type="radio" name="person" value="Carol" checked /><span class="habit-tile"><img class="sprite" src="icons/pixel/cat-carol.svg" alt="" /></span>Carol</label>
+          <label class="person-option is-allen"><input type="radio" name="person" value="Allen" /><span class="habit-tile"><img class="sprite" src="icons/pixel/cat-allen.svg" alt="" /></span>Allen</label>
         </div>
         <label>运动项目<select id="activity" required><option value="跑步">跑步</option><option value="无氧/力量">无氧/力量</option><option value="游泳">游泳</option><option value="骑行">骑行</option><option value="瑜伽">瑜伽</option></select></label>
         <label>运动日期<input id="workoutDate" type="date" required /></label>
