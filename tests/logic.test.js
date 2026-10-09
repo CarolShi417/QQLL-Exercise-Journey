@@ -12,11 +12,27 @@ test('month switching after saving a workout on the 31st does not skip months', 
 
 test('record fields are escaped before being written as HTML', () => {
   const evil = { id:'1" onclick="x', person:'Carol', activity:'<img src=x onerror=alert(1)>', minutes:'<b>', calories:1, date:'2026-10-08' };
-  for (const html of [Q.calendarEntryHtml(evil, '2026-10-08'), Q.dayEntryHtml(evil)]) {
+  for (const html of [Q.dayEntryHtml(evil, false), Q.dayEntryHtml(evil, true)]) {
     assert.ok(!html.includes('<img'), html);
     assert.ok(!html.includes('<b><b>'), html);
     assert.ok(!html.includes('" onclick="'), html);
   }
+});
+
+test('delete button only appears when the record can be deleted', () => {
+  const record = { id:42, person:'Allen', activity:'跑步', minutes:30, calories:300 };
+  assert.ok(Q.dayEntryHtml(record, true).includes('data-delete="42"'));
+  assert.ok(!Q.dayEntryHtml(record, false).includes('data-delete'));
+});
+
+test('levels keep the original 100 / 300 / 600 thresholds and continue without a cap', () => {
+  assert.deepEqual(Q.currentLevel(0), { level:0, start:0, next:100 });
+  assert.deepEqual(Q.currentLevel(300), { level:2, start:300, next:600 });
+  assert.deepEqual(Q.currentLevel(999.9), { level:3, start:600, next:1000 });
+  assert.deepEqual(Q.currentLevel(1000), { level:4, start:1000, next:1500 });
+  assert.equal(Q.currentLevel(5500).level, 10);
+  assert.equal(Q.currentLevel(5499).level, 9);
+  assert.equal(Q.currentLevel(-5).level, 0);
 });
 
 test('unknown person values render as a neutral label instead of crashing', () => {

@@ -16,4 +16,5 @@ node --test
 - supabase-js 锁定版本并带 SRI。升级时从 `https://data.jsdelivr.com/v1/packages/npm/@supabase/supabase-js@<版本>?structure=flat` 取 `/dist/umd/supabase.js` 的 hash，填成 `sha256-<hash>`。
 - 迁移 SQL 由人手动粘贴到 SQL Editor 运行，没有 CLI 关联；新增迁移要写成可重复运行的形式。
 - 在 `onAuthStateChange` 回调里不要直接 await Supabase 调用（会锁死 auth），用 `setTimeout` 推迟。
+- 等级、连续天数、徽章、每周 Boss 都由 `game.js` 从打卡记录推算，不存数据库。加新玩法时保持这个做法：数据库只存服务器校验过的打卡，前端就没有可以篡改的分数。
 - 主屏幕图标的源图是 `icons/QL.png`（1254×1254），改完要重新导出 `apple-touch-icon.png`(180)、`icon-192.png`、`icon-512.png`，三个都必须是不透明的正方形（iOS 会把透明部分填成黑色）。iOS 在添加到主屏幕时缓存图标和名称，换图后要删掉主屏幕图标重新添加。
