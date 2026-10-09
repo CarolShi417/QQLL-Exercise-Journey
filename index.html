@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#f7f7f8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://cqlnxptzqlhzrayxgdvk.supabase.co wss://cqlnxptzqlhzrayxgdvk.supabase.co; object-src 'none'; base-uri 'none'; form-action 'self'" />
+    <meta name="referrer" content="no-referrer" />
     <title>C&A Exercise Journey</title>
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="overrides.css" />
@@ -12,10 +14,11 @@
     <section class="auth-screen" id="authScreen" aria-label="登录">
       <form class="auth-card" id="authForm">
         <div class="auth-fields">
-          <input id="emailInput" type="email" autocomplete="email" placeholder="邮箱地址" aria-label="邮箱地址" required />
+          <input id="emailInput" type="email" autocomplete="username" placeholder="邮箱地址" aria-label="邮箱地址" required />
+          <input id="passwordInput" type="password" autocomplete="current-password" placeholder="密码" aria-label="密码" required />
           <button class="save-button" type="submit">登录</button>
         </div>
-        <p class="auth-message" id="authMessage">请输入邮箱登录</p>
+        <p class="auth-message" id="authMessage">请输入邮箱和密码登录</p>
       </form>
     </section>
     <main class="app-shell">
@@ -61,6 +64,11 @@
           <div class="progress-track"><div class="allen-progress" id="allenProgress"></div></div>
         </div>
         <p class="goal-note">卡路里 ÷ 10 = 经验值。100 XP 升 Lv.1，300 XP 升 Lv.2，600 XP 升 Lv.3。</p>
+        <div class="account-card">
+          <p id="accountInfo"></p>
+          <button class="link-button" id="exportRecords" type="button">导出全部记录（JSON）</button>
+          <button class="link-button is-danger" id="signOut" type="button">退出登录</button>
+        </div>
       </section>
     </main>
 
@@ -85,7 +93,8 @@
       </form>
     </dialog>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js" integrity="sha256-hO6b9FaVwd07oVlba8+w8JZyQ0YxNR/8jr6RQFRdX/Y=" crossorigin="anonymous"></script>
+    <script src="logic.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
