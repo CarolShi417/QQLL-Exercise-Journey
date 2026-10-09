@@ -3,7 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#f7f7f8" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#15141a" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f6f5f2" media="(prefers-color-scheme: light)" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self'; img-src 'self' data: blob:; connect-src 'self' https://pnjwkpxmkyoutpazlfuf.supabase.co wss://pnjwkpxmkyoutpazlfuf.supabase.co; object-src 'none'; base-uri 'none'; form-action 'self'" />
     <meta name="referrer" content="no-referrer" />
     <title>C&A Exercise Journey</title>
@@ -14,94 +16,110 @@
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
     <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="preload" href="fonts/nunito-latin-800.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="styles.css" />
-    <link rel="stylesheet" href="overrides.css" />
   </head>
   <body>
+    <!-- Tabler Icons (MIT)，用 <svg><use href="#i-…"/></svg> 引用 -->
+    <svg class="icon-sprite" aria-hidden="true">
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5l0 14"/><path d="M5 12l14 0"/></symbol>
+      <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 10.941c2.333 -3.308 .167 -7.823 -1 -8.941c0 3.395 -2.235 5.299 -3.667 6.706c-1.43 1.408 -2.333 3.294 -2.333 5.588c0 3.704 3.134 6.706 7 6.706c3.866 0 7 -3.002 7 -6.706c0 -1.712 -1.232 -4.403 -2.333 -5.588c-2.084 3.353 -3.257 3.353 -4.667 2.235"/></symbol>
+      <symbol id="i-calendar" viewBox="0 0 24 24"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M4 11h16"/><path d="M11 15h1"/><path d="M12 15v3"/></symbol>
+      <symbol id="i-calendar-month" viewBox="0 0 24 24"><path d="M4 7a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M4 11h16"/><path d="M8 14v4"/><path d="M12 14v4"/><path d="M16 14v4"/></symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7l16 0"/><path d="M10 11l0 6"/><path d="M14 11l0 6"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12"/><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3"/></symbol>
+      <symbol id="i-home" viewBox="0 0 24 24"><path d="M5 12l-2 0l9 -9l9 9l-2 0"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7"/><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6"/></symbol>
+      <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 21l8 0"/><path d="M12 17l0 4"/><path d="M7 4l10 0"/><path d="M17 4v8a5 5 0 0 1 -10 0v-8"/><path d="M3 9a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M17 9a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/></symbol>
+      <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6l-12 12"/><path d="M6 6l12 12"/></symbol>
+      <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="M15 6l-6 6l6 6"/></symbol>
+      <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="M9 6l6 6l-6 6"/></symbol>
+      <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572"/></symbol>
+      <symbol id="i-logout" viewBox="0 0 24 24"><path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2"/><path d="M9 12h12l-3 -3"/><path d="M18 15l3 -3"/></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"/><path d="M7 11l5 5l5 -5"/><path d="M12 4l0 12"/></symbol>
+    </svg>
+
     <section class="auth-screen" id="authScreen" aria-label="登录">
       <form class="auth-card" id="authForm">
+        <img class="auth-logo" src="icons/apple-touch-icon.png" alt="" width="72" height="72" />
+        <h1 class="auth-title">QQLL</h1>
+        <p class="auth-subtitle">两个人的运动打卡</p>
         <div class="auth-fields">
           <input id="emailInput" type="email" autocomplete="username" placeholder="邮箱地址" aria-label="邮箱地址" required />
           <input id="passwordInput" type="password" autocomplete="current-password" placeholder="密码" aria-label="密码" required />
-          <button class="save-button" type="submit">登录</button>
+          <button class="primary-button" type="submit">登录</button>
         </div>
         <p class="auth-message" id="authMessage">请输入邮箱和密码登录</p>
       </form>
     </section>
+
     <main class="app-shell">
-      <section class="view is-active" id="today" aria-label="本周训练">
-        <p class="period" id="weekPeriod"></p>
-        <div class="weekly-comparison">
-          <article class="person-panel carol-panel">
-            <div class="person-top"><span class="avatar">C</span><span>Carol</span></div>
-            <div class="metric"><strong id="carolSessions">0</strong><span>次训练</span></div>
-            <div class="metric calories"><strong id="carolCalories">0</strong><span>周消耗 kcal</span></div>
-          </article>
-          <div class="divider"></div>
-          <article class="person-panel allen-panel">
-            <div class="person-top"><span class="avatar">A</span><span>Allen</span></div>
-            <div class="metric"><strong id="allenSessions">0</strong><span>次训练</span></div>
-            <div class="metric calories"><strong id="allenCalories">0</strong><span>周消耗 kcal</span></div>
-          </article>
+      <header class="app-header">
+        <div>
+          <h1 class="app-title">QQLL</h1>
+          <p class="period" id="weekPeriod"></p>
         </div>
-        <button id="openCheckin" class="checkin-button" type="button"><span>＋</span> 新增打卡</button>
+        <button class="round-button is-brand" id="openCheckin" type="button" aria-label="新增打卡"><svg class="icon"><use href="#i-plus"/></svg></button>
+      </header>
+
+      <section class="view is-active" id="today" aria-label="首页">
+        <div class="habit-list" id="habitList"></div>
       </section>
 
       <section class="view" id="records" aria-label="运动记录">
-        <div class="calendar-card">
+        <div class="card calendar-card">
           <div class="month-switcher">
-            <button id="previousMonth" type="button" aria-label="上个月">‹</button>
+            <button class="icon-button" id="previousMonth" type="button" aria-label="上个月"><svg class="icon"><use href="#i-chevron-left"/></svg></button>
             <strong id="calendarMonth"></strong>
-            <button id="nextMonth" type="button" aria-label="下个月">›</button>
+            <button class="icon-button" id="nextMonth" type="button" aria-label="下个月"><svg class="icon"><use href="#i-chevron-right"/></svg></button>
           </div>
           <div class="weekdays"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
           <div class="calendar" id="calendar"></div>
         </div>
-        <div class="legend"><span><i class="carol-dot"></i>Carol</span><span><i class="allen-dot"></i>Allen</span><span><i class="both-dot"></i>一起运动</span></div>
+        <div class="legend"><span><i class="dot is-carol"></i>Carol</span><span><i class="dot is-allen"></i>Allen</span><span><i class="dot is-both"></i>一起运动</span></div>
         <div class="day-records" id="dayRecords"><p>点按日期，查看当天记录</p></div>
       </section>
 
       <section class="view" id="achievements" aria-label="运动成就">
-        <div class="achievement-card">
-          <div class="achievement-copy"><div class="achievement-profile"><span class="avatar carol-avatar">C</span><strong>Carol <em id="carolLevel">Lv.0</em></strong></div><div class="achievement-progress-copy"><p>累计经验</p><b id="carolProgressText">0 / 100 XP</b></div></div>
-          <div class="progress-track"><div class="carol-progress" id="carolProgress"></div></div>
+        <div class="card achievement-card is-carol">
+          <div class="achievement-row"><span class="habit-tile">C</span><div class="achievement-copy"><strong>Carol <em id="carolLevel">Lv.0</em></strong><b id="carolProgressText">0 / 100 XP</b></div></div>
+          <div class="progress-track"><div class="progress-bar" id="carolProgress"></div></div>
         </div>
-        <div class="achievement-card">
-          <div class="achievement-copy"><div class="achievement-profile"><span class="avatar allen-avatar">A</span><strong>Allen <em id="allenLevel">Lv.0</em></strong></div><div class="achievement-progress-copy"><p>累计经验</p><b id="allenProgressText">0 / 100 XP</b></div></div>
-          <div class="progress-track"><div class="allen-progress" id="allenProgress"></div></div>
+        <div class="card achievement-card is-allen">
+          <div class="achievement-row"><span class="habit-tile">A</span><div class="achievement-copy"><strong>Allen <em id="allenLevel">Lv.0</em></strong><b id="allenProgressText">0 / 100 XP</b></div></div>
+          <div class="progress-track"><div class="progress-bar" id="allenProgress"></div></div>
         </div>
         <p class="goal-note">卡路里 ÷ 10 = 经验值。100 XP 升 Lv.1，300 XP 升 Lv.2，600 XP 升 Lv.3。</p>
-        <div class="account-card">
+        <div class="card account-card">
           <p id="accountInfo"></p>
-          <button class="link-button" id="exportRecords" type="button">导出全部记录（JSON）</button>
-          <button class="link-button is-danger" id="signOut" type="button">退出登录</button>
+          <button class="link-button" id="exportRecords" type="button"><svg class="icon"><use href="#i-download"/></svg>导出全部记录（JSON）</button>
+          <button class="link-button is-danger" id="signOut" type="button"><svg class="icon"><use href="#i-logout"/></svg>退出登录</button>
         </div>
       </section>
     </main>
 
     <nav class="bottom-nav" aria-label="页面切换">
-      <button class="nav-item is-active" data-view="today" type="button"><span>⌂</span>今日</button>
-      <button class="nav-item" data-view="records" type="button"><span>□</span>日历</button>
-      <button class="nav-item" data-view="achievements" type="button"><span>★</span>成就</button>
+      <button class="nav-item is-active" data-view="today" type="button"><svg class="icon"><use href="#i-home"/></svg>首页</button>
+      <button class="nav-item" data-view="records" type="button"><svg class="icon"><use href="#i-calendar-month"/></svg>日历</button>
+      <button class="nav-item" data-view="achievements" type="button"><svg class="icon"><use href="#i-trophy"/></svg>成就</button>
     </nav>
 
     <dialog class="checkin-dialog" id="checkinDialog">
       <form class="checkin-form" id="activityForm">
-        <div class="dialog-top"><strong>新增打卡</strong><button class="close-button" id="closeCheckin" type="button" aria-label="关闭">×</button></div>
+        <div class="dialog-top"><strong>新增打卡</strong><button class="icon-button" id="closeCheckin" type="button" aria-label="关闭"><svg class="icon"><use href="#i-x"/></svg></button></div>
         <div class="person-picker">
-          <label class="person-option is-selected"><input type="radio" name="person" value="Carol" checked /><span class="avatar">C</span>Carol</label>
-          <label class="person-option"><input type="radio" name="person" value="Allen" /><span class="avatar">A</span>Allen</label>
+          <label class="person-option is-carol is-selected"><input type="radio" name="person" value="Carol" checked /><span class="habit-tile">C</span>Carol</label>
+          <label class="person-option is-allen"><input type="radio" name="person" value="Allen" /><span class="habit-tile">A</span>Allen</label>
         </div>
         <label>运动项目<select id="activity" required><option value="跑步">跑步</option><option value="无氧/力量">无氧/力量</option><option value="游泳">游泳</option><option value="骑行">骑行</option><option value="瑜伽">瑜伽</option></select></label>
         <label>运动日期<input id="workoutDate" type="date" required /></label>
-        <label>运动时间（分钟）<input id="minutes" type="number" min="1" max="1440" value="30" required /></label>
+        <label>运动时间（分钟）<input id="minutes" type="number" inputmode="numeric" min="1" max="1440" value="30" required /></label>
         <p class="calorie-preview">预计获得 <strong id="caloriePreview">300</strong> kcal · <strong id="xpPreview">30</strong> XP</p>
-        <button class="save-button" type="submit">保存打卡</button>
+        <button class="primary-button" type="submit">保存打卡</button>
       </form>
     </dialog>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js" integrity="sha256-hO6b9FaVwd07oVlba8+w8JZyQ0YxNR/8jr6RQFRdX/Y=" crossorigin="anonymous"></script>
     <script src="logic.js"></script>
+    <script src="game.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
