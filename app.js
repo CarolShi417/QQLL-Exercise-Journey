@@ -1,6 +1,6 @@
 // Supabase URL and publishable key are public by design; access control lives in RLS (supabase/migrations).
-const SUPABASE_URL = 'https://cqlnxptzqlhzrayxgdvk.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_oCWiZ7_-nSntavkfvnPTJQ_sR_F2yNn';
+const SUPABASE_URL = 'https://pnjwkpxmkyoutpazlfuf.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_JSN0j-Lr3IbIiH2eGT5elg_5LhLHIDh';
 const LEGACY_STORAGE_KEYS = ['ca-exercise-journey-v1', 'ca-exercise-journey-supabase-migrated-v1'];
 const PAGE_SIZE = 1000;
 const $ = (selector) => document.querySelector(selector);
