@@ -35,8 +35,21 @@ function errorText(error) {
 }
 
 const toastQueue = [];
-function showToast(text, { celebrate = false } = {}) {
-  toastQueue.push({ text, celebrate });
+let toastTimer = null;
+let toastGapTimer = null;
+// A toast with a `key` replaces a showing or waiting toast with the same key instead of queueing behind it,
+// so tapping the theme button three times shows one updating toast, not eight seconds of them.
+function showToast(text, { celebrate = false, key = null } = {}) {
+  const same = key ? toastQueue.findIndex((item) => item.key === key) : -1;
+  if (same === 0) {
+    clearTimeout(toastTimer); clearTimeout(toastGapTimer);
+    toastQueue[0].text = text;
+    const toast = $('#toast'); toast.textContent = text; toast.classList.add('show');
+    toastTimer = setTimeout(endToast, 2600);
+    return;
+  }
+  if (same > 0) { toastQueue[same].text = text; return; }
+  toastQueue.push({ text, celebrate, key });
   if (toastQueue.length === 1) playToast();
 }
 function playToast() {
@@ -45,7 +58,11 @@ function playToast() {
   toast.classList.toggle('is-celebrate', celebrate);
   toast.classList.add('show');
   if (celebrate) pixelBurst(toast);
-  setTimeout(() => { toast.classList.remove('show'); setTimeout(() => { toastQueue.shift(); if (toastQueue.length) playToast(); }, 220); }, celebrate ? 3000 : 2600);
+  toastTimer = setTimeout(endToast, celebrate ? 3000 : 2600);
+}
+function endToast() {
+  $('#toast').classList.remove('show');
+  toastGapTimer = setTimeout(() => { toastQueue.shift(); if (toastQueue.length) playToast(); }, 220);
 }
 function pixelBurst(host) {
   const burst = document.createElement('span'); burst.className = 'burst';
@@ -60,6 +77,15 @@ function pixelBurst(host) {
 }
 function showSplash() { $('#splash').classList.remove('is-done'); }
 function hideSplash() { $('#splash').classList.add('is-done'); }
+function updateThemeButton() {
+  const choice = window.QQLLTheme.preference(); const label = `外观：${window.QQLLTheme.LABELS[choice]}`;
+  const button = $('#themeToggle'); button.setAttribute('aria-label', `${label}，点按切换`); button.title = label;
+  button.querySelector('use').setAttribute('href', `#i-theme-${choice}`);
+}
+function toggleTheme() {
+  const next = window.QQLLTheme.nextTheme(window.QQLLTheme.preference());
+  window.QQLLTheme.set(next); updateThemeButton(); showToast(`外观：${window.QQLLTheme.LABELS[next]}`, { key:'theme' });
+}
 function setAuthMessage(message, isError = false) { const element = $('#authMessage'); element.textContent = message; element.classList.toggle('is-error', isError); }
 function showAuthScreen() { $('#authScreen').classList.remove('is-hidden'); }
 function hideAuthScreen() { $('#authScreen').classList.add('is-hidden'); }
@@ -345,6 +371,7 @@ function bindUi() {
   $('#previousMonth').addEventListener('click', () => { displayedMonth = Q.shiftMonth(displayedMonth, -1); selectedDate = null; renderCalendar(); renderDayRecords(); });
   $('#nextMonth').addEventListener('click', () => { displayedMonth = Q.shiftMonth(displayedMonth, 1); selectedDate = null; renderCalendar(); renderDayRecords(); });
   $('#openCheckin').addEventListener('click', () => openCheckin());
+  $('#themeToggle').addEventListener('click', toggleTheme);
   $('#closeCheckin').addEventListener('click', () => $('#checkinDialog').close());
   $('#habitList').addEventListener('click', (event) => {
     const checkin = event.target.closest('[data-checkin]');
@@ -368,7 +395,7 @@ function bindUi() {
 
 function boot() {
   try { LEGACY_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key)); } catch { /* storage unavailable */ }
-  render();
+  render(); updateThemeButton();
   if (!window.supabase) { showAuthScreen(); hideSplash(); $('#authForm button').disabled = true; setAuthMessage('登录组件加载失败，请检查网络后刷新页面', true); return; }
   supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, { auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:false } });
   bindUi();
