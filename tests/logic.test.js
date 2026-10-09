@@ -13,7 +13,8 @@ test('month switching after saving a workout on the 31st does not skip months', 
 test('record fields are escaped before being written as HTML', () => {
   const evil = { id:'1" onclick="x', person:'Carol', activity:'<img src=x onerror=alert(1)>', minutes:'<b>', calories:1, date:'2026-10-08' };
   for (const html of [Q.dayEntryHtml(evil, false), Q.dayEntryHtml(evil, true)]) {
-    assert.ok(!html.includes('<img'), html);
+    assert.ok(!html.includes('<img src=x'), html);
+    assert.ok(html.includes('&lt;img src=x onerror=alert(1)&gt;'), html);
     assert.ok(!html.includes('<b><b>'), html);
     assert.ok(!html.includes('" onclick="'), html);
   }

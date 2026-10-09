@@ -29,11 +29,12 @@
   function isInWeek(entry, now = new Date()) { const { monday, sunday } = weekRange(now); const date = new Date(`${entry.date}T00:00:00`); return date >= monday && date <= sunday; }
 
   function personClass(person, prefix) { return person === 'Carol' ? `${prefix}carol` : `${prefix}allen`; }
+  function catHtml(person) { return `<img class="sprite" src="icons/pixel/${personClass(person, 'cat-')}.svg" alt="" />`; }
   function dayEntryHtml(entry, canDelete) {
     const remove = canDelete ? `<button class="icon-button is-danger" type="button" data-delete="${escapeHtml(entry.id)}" aria-label="删除这条记录"><svg class="icon" aria-hidden="true"><use href="#i-trash"/></svg></button>` : '';
-    return `<article class="day-entry ${personClass(entry.person, 'is-')}"><span class="habit-tile">${escapeHtml(String(entry.person || '?')[0])}</span><div class="day-entry-copy"><strong>${escapeHtml(entry.person)} · ${escapeHtml(entry.activity)}</strong><span>${escapeHtml(entry.minutes)} 分钟 · ${escapeHtml(entry.calories)} kcal</span></div>${remove}</article>`;
+    return `<article class="day-entry ${personClass(entry.person, 'is-')}"><span class="habit-tile">${catHtml(entry.person)}</span><div class="day-entry-copy"><strong>${escapeHtml(entry.person)} · ${escapeHtml(entry.activity)}</strong><span>${escapeHtml(entry.minutes)} 分钟 · ${escapeHtml(entry.calories)} kcal</span></div>${remove}</article>`;
   }
 
-  const api = { CALORIE_RATES, PEOPLE, escapeHtml, dateKey, monthStart, workoutMonth, shiftMonth, calculateCalories, experience, levelStart, currentLevel, totals, sessions, weekRange, isInWeek, dayEntryHtml };
+  const api = { CALORIE_RATES, PEOPLE, escapeHtml, dateKey, monthStart, workoutMonth, shiftMonth, calculateCalories, experience, levelStart, currentLevel, totals, sessions, weekRange, isInWeek, catHtml, dayEntryHtml };
   if (typeof module === 'object' && module.exports) module.exports = api; else root.QQLL = api;
 })(this);

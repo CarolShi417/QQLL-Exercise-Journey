@@ -59,8 +59,8 @@ test('person days and together days', () => {
 });
 
 test('level titles step up and hold between milestones', () => {
-  assert.equal(G.levelTitle(0), '新手村民');
-  assert.equal(G.levelTitle(3), '晨光骑士');
+  assert.equal(G.levelTitle(0), '小奶猫');
+  assert.equal(G.levelTitle(3), '爬架猫');
   assert.equal(G.levelTitle(12), G.levelTitle(10));
   assert.notEqual(G.levelTitle(15), G.levelTitle(14));
   assert.equal(G.levelTitle(99), G.levelTitle(20));
