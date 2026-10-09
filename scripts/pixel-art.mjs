@@ -1,4 +1,4 @@
-// Generates the pixel icon sprite inside index.html and the multi-colour sprites in icons/pixel/.
+// Generates the pixel icon sprite inside index.html and the paw masks in icons/pixel/.
 // Run `npm run build:assets` after editing any drawing below.
 // Icons come from pixelarticons (MIT, 12×12 cells on a 24 viewBox); paw, run, barbell and bike are drawn here in the same grid.
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
@@ -76,55 +76,7 @@ const CUSTOM_ICONS = {
   ],
 };
 
-// 16×16 sitting cats drawn from photos of our own cats (photos stay local, see .gitignore).
-// Letters map to each cat's palette; '.' is transparent.
-const CATS = {
-  // Carol: ginger-and-white — ginger head with a white blaze down to the muzzle, green eyes, white chest, ginger flanks.
-  carol: {
-    rows: [
-      '..K..........K..',
-      '.KPK........KPK.',
-      '.KPFKKKKKKKKFPK.',
-      '.KFFSFFSSFFSFFK.',
-      'KFFFFSFFFFSFFFFK',
-      'KFFEEFFWWFFEEFFK',
-      'KFFEDFWWWWFDEFFK',
-      'KFFWWWWPPWWWWFFK',
-      'KFWWWWKWWKWWWWFK',
-      '.KWWWWWKKWWWWWK.',
-      '..KKWWWWWWWWKK..',
-      '.KFFWWWWWWWWFFK.',
-      '.KFFWWWWWWWWFFK.',
-      '.KFSWWWWWWWWSFK.',
-      '.KFWWKWWWWKWWFK.',
-      '..KKKKKKKKKKKKK.',
-    ],
-    palette: { K:'#4a3226', F:'#e8954a', S:'#c4702e', W:'#fffaf2', E:'#79a064', D:'#2b2420', P:'#f2a3a8' },
-  },
-  // Allen: golden-tan Persian with a flat face — small tufted ears, dark stripes converging down the forehead,
-  // big yellow-green eyes, small pinkish nose, cream ruff, darker striped legs.
-  allen: {
-    rows: [
-      '................',
-      '.K............K.',
-      '.KLK........KLK.',
-      '.KLFKKKKKKKKFLK.',
-      '.KFFFSFSSFSFFFK.',
-      '.KFEEFFSSFFEEFK.',
-      'KFFEDFFFFFFDEFFK',
-      'LFLLFFFNNFFFLLFL',
-      'LLLLLLKLLKLLLLLL',
-      '.LWWWWWKKWWWWWL.',
-      '.KWWWWWWWWWWWWK.',
-      '.KFWWWWWWWWWWFK.',
-      '.KFFWWWWWWWWFFK.',
-      '.KSFFWWWWWWFFSK.',
-      '.KSFSKFFFFKSFSK.',
-      '..KKKKKKKKKKKKK.',
-    ],
-    palette: { K:'#3b2e22', F:'#b8996f', S:'#5e4835', L:'#dcc8a6', W:'#f0e8da', E:'#c3bf4c', D:'#241b14', N:'#c98a7e' },
-  },
-};
+// The cat avatars (icons/pixel/cat-carol.svg, cat-allen.svg) are hand-made 32×32 pixel art and are NOT generated here.
 
 function check(name, rows, size) {
   if (rows.length !== size || rows.some((row) => row.length !== size)) throw new Error(`${name} must be ${size}×${size}`);
@@ -152,17 +104,11 @@ function librarySymbol(id, file) {
   if (!paths) throw new Error(`no paths in pixelarticons/${file}`);
   return `<symbol id="i-${id}" viewBox="0 0 24 24">${paths}</symbol>`;
 }
-function spriteSvg(rows, palette) {
-  let rects = '';
-  rows.forEach((row, y) => [...row].forEach((cell, x) => { if (palette[cell]) rects += `<rect x="${x}" y="${y}" width="1" height="1" fill="${palette[cell]}"/>`; }));
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${rows[0].length} ${rows.length}" shape-rendering="crispEdges">${rects}</svg>\n`;
-}
 function maskSvg(rows) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" shape-rendering="crispEdges"><path fill="#000" d="${iconPath(rows)}"/></svg>\n`;
 }
 
 Object.entries(CUSTOM_ICONS).forEach(([name, rows]) => check(name, rows, 12));
-Object.entries(CATS).forEach(([person, cat]) => { check(`cat-${person}`, cat.rows, 16); [...cat.rows.join('')].forEach((cell) => { if (cell !== '.' && !cat.palette[cell]) throw new Error(`cat-${person}: no colour for '${cell}'`); }); });
 
 const symbols = [
   ...Object.entries(LIBRARY_ICONS).map(([id, file]) => librarySymbol(id, file)),
@@ -177,7 +123,6 @@ writeFileSync(indexPath, html.replace(new RegExp(`${start}[\\s\\S]*?${end}`), bl
 
 const out = join(root, 'icons', 'pixel');
 mkdirSync(out, { recursive:true });
-Object.entries(CATS).forEach(([person, cat]) => writeFileSync(join(out, `cat-${person}.svg`), spriteSvg(cat.rows, cat.palette)));
 writeFileSync(join(out, 'paw.svg'), maskSvg(CUSTOM_ICONS.paw));
 writeFileSync(join(out, 'paw-empty.svg'), maskSvg(outline(CUSTOM_ICONS.paw)));
-console.log(`sprite: ${symbols.length} icons · cats: ${Object.keys(CATS).join(', ')} · paw masks`);
+console.log(`sprite: ${symbols.length} icons · paw masks`);
