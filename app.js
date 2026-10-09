@@ -326,6 +326,36 @@ function stopApp() {
   if ($('#checkinDialog').open) $('#checkinDialog').close();
   render(); showView('today'); showAuthScreen(); hideSplash();
 }
+// Re-import a JSON backup (from this app or the daily auto-backup). Records already present are skipped,
+// so importing the same file twice is harmless. Rows go through the normal insert path, so the server
+// still recomputes calories and records who imported them.
+const IMPORT_BATCH = 200;
+async function importRecords(file) {
+  let plan;
+  try {
+    const { records, invalid } = window.QQLLBackup.parseBackup(await file.text());
+    plan = { ...window.QQLLBackup.planImport(entries, records), invalid, total:records.length + invalid };
+  } catch (error) { showToast(error.message); return; }
+  if (!plan.toInsert.length) { showToast(`没有需要导入的新记录（已存在 ${plan.duplicates} 条${plan.invalid ? `，${plan.invalid} 条格式不对` : ''}）`); return; }
+  const skipped = [plan.duplicates ? `跳过已存在的 ${plan.duplicates} 条` : '', plan.invalid ? `${plan.invalid} 条格式不对` : ''].filter(Boolean).join('，');
+  if (!confirm(`备份里有 ${plan.total} 条记录，将导入 ${plan.toInsert.length} 条${skipped ? `（${skipped}）` : ''}。继续？`)) return;
+  const button = $('#importRecords'); button.disabled = true; showToast('正在导入…', { key:'import' });
+  let imported = 0;
+  try {
+    for (let i = 0; i < plan.toInsert.length; i += IMPORT_BATCH) {
+      const batch = plan.toInsert.slice(i, i + IMPORT_BATCH).map((record) => ({ person:record.person, activity:record.activity, minutes:record.minutes, calories:Q.calculateCalories(record.activity, record.minutes), workout_date:record.date }));
+      const { error } = await supabaseClient.from('workouts').insert(batch);
+      if (error) throw error;
+      imported += batch.length;
+    }
+    showToast(`已导入 ${imported} 条记录`, { key:'import' });
+  } catch (error) {
+    showToast(imported ? `导入了 ${imported} 条后出错：${errorText(error)}` : `导入失败：${errorText(error)}`, { key:'import' });
+  } finally {
+    button.disabled = false;
+    await loadRemoteRecords().catch((error) => console.error(error));
+  }
+}
 function exportRecords() {
   const blob = new Blob([JSON.stringify({ exported_at:new Date().toISOString(), workouts:entries.map(({ person, activity, minutes, calories, date }) => ({ person, activity, minutes, calories, date })) }, null, 2)], { type:'application/json' });
   const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = `CA-Exercise-Journey-${Q.dateKey(new Date())}.json`; link.click(); setTimeout(() => URL.revokeObjectURL(link.href), 1000);
@@ -390,6 +420,8 @@ function bindUi() {
   $('#authForm').addEventListener('submit', submitLogin);
   $('#signOut').addEventListener('click', async () => { if (!confirm('退出登录？')) return; const { error } = await supabaseClient.auth.signOut(); if (error) showToast(`退出失败：${errorText(error)}`); });
   $('#exportRecords').addEventListener('click', exportRecords);
+  $('#importRecords').addEventListener('click', () => $('#importFile').click());
+  $('#importFile').addEventListener('change', (event) => { const [file] = event.target.files; event.target.value = ''; if (file) importRecords(file); });
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') scheduleReload(); });
 }
 

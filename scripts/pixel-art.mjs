@@ -14,7 +14,7 @@ const LIBRARY_ICONS = {
   plus:'plus', flame:'fire', calendar:'calendar', 'calendar-month':'calendar-weeks', trash:'trash', home:'home', trophy:'trophy',
   x:'close', 'chevron-left':'chevron-left', 'chevron-right':'chevron-right', heart:'heart', logout:'logout', download:'download',
   lock:'lock', flag:'flag', moon:'moon', shield:'shield', zap:'zap', star:'star', users:'users', sword:'sword', crown:'crown',
-  swim:'waves', yoga:'human-arms-up', 'theme-auto':'monitor', 'theme-light':'sun', 'theme-dark':'moon',
+  swim:'waves', yoga:'human-arms-up', upload:'upload', 'theme-auto':'monitor', 'theme-light':'sun', 'theme-dark':'moon',
 };
 
 const CUSTOM_ICONS = {

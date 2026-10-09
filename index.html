@@ -46,6 +46,7 @@
       <symbol id="i-crown" viewBox="0 0 24 24"><path d="M3 3h2v12H3zm16 0h2v12h-2zm-8 0h2v2h-2zM9 5h2v2H9zM5 5h2v2H5z"/><path d="M3 3h2v2H3zm4 4h2v2H7zm6-2h2v2h-2zm2 2h2v2h-2zm2-2h2v2h-2zM5 15h14v2H5zm-2 4h18v2H3z"/></symbol>
       <symbol id="i-swim" viewBox="0 0 24 24"><path d="M2 18h4v-2H2zm0-6h4v-2H2zm0-6h4V4H2zm4 14h4v-2H6zm0-6h4v-2H6zm0-6h4V6H6zm4 10h4v-2h-4zm0-6h4v-2h-4zm0-6h4V4h-4zm4 14h4v-2h-4zm0-6h4v-2h-4zm0-6h4V6h-4zm4 10h4v-2h-4zm0-6h4v-2h-4zm0-6h4V4h-4z"/></symbol>
       <symbol id="i-yoga" viewBox="0 0 24 24"><path d="M10 2h4v4h-4zM7 7h10v2H7zm2 2h2v7H9zm4 0h2v7h-2zm-4 7h2v6H9zm4 0h2v6h-2zm-2-2h2v2h-2zM5 5h2v2H5zM3 3h2v2H3zm14 2h2v2h-2zm2-2h2v2h-2z"/></symbol>
+      <symbol id="i-upload" viewBox="0 0 24 24"><path d="M19 21H5v-2h14v2ZM5 19H3v-4h2v4Zm16 0h-2v-4h2v4ZM13 5h2v2h2v2h-4v8h-2V9H7V7h2V5h2V3h2v2Z"/></symbol>
       <symbol id="i-theme-auto" viewBox="0 0 24 24"><path d="M4 2h16v2H4zm0 14h16v2H4zM2 4h2v12H2zm18 0h2v12h-2zm-9 14h2v2h-2zm-3 2h8v2H8z"/></symbol>
       <symbol id="i-theme-light" viewBox="0 0 24 24"><path d="M13 22h-2v-3h2v3Zm-6-3H5v-2h2v2Zm12 0h-2v-2h2v2Zm-4-2H9v-2h6v2Zm-6-2H7V9h2v6Zm8 0h-2V9h2v6ZM5 13H2v-2h3v2Zm17 0h-3v-2h3v2Zm-7-4H9V7h6v2ZM7 7H5V5h2v2Zm12 0h-2V5h2v2Zm-6-2h-2V2h2v3Z"/></symbol>
       <symbol id="i-theme-dark" viewBox="0 0 24 24"><path d="M18 22H8v-2h10v2ZM8 20H6v-2h2v2Zm12 0h-2v-2h2v2ZM6 18H4v-2h2v2Zm16 0h-2v-4h-2v-2h2v-2h2v8ZM4 16H2V6h2v10Zm14 0h-6v-2h6v2Zm-6-2h-2v-2h2v2Zm-2-2H8V6h2v6ZM6 6H4V4h2v2Zm8-2h-2v2h-2V4H6V2h8v2Z"/></symbol>
@@ -123,6 +124,8 @@
         <div class="card account-card">
           <p id="accountInfo"></p>
           <button class="link-button" id="exportRecords" type="button"><svg class="icon"><use href="#i-download"/></svg>导出全部记录（JSON）</button>
+          <button class="link-button" id="importRecords" type="button"><svg class="icon"><use href="#i-upload"/></svg>导入备份（JSON）</button>
+          <input class="visually-hidden" id="importFile" type="file" accept="application/json,.json" tabindex="-1" aria-hidden="true" />
           <button class="link-button is-danger" id="signOut" type="button"><svg class="icon"><use href="#i-logout"/></svg>退出登录</button>
         </div>
       </section>
@@ -152,6 +155,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js" integrity="sha256-hO6b9FaVwd07oVlba8+w8JZyQ0YxNR/8jr6RQFRdX/Y=" crossorigin="anonymous"></script>
     <script src="logic.js"></script>
     <script src="game.js"></script>
+    <script src="backup.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
