@@ -47,6 +47,14 @@ test('records already in the app are skipped, counting duplicates one for one', 
   assert.deepEqual(toInsert.map((record) => record.date), ['2026-10-01', '2026-10-03']);
 });
 
+test('only the importer\'s own records are imported; the partner\'s are counted separately', () => {
+  const incoming = [row(), row({ person:'Allen' }), row({ person:'Allen', date:'2026-10-02' }), row({ date:'2026-10-02' })];
+  const { toInsert, duplicates, others } = B.planImport([row()], incoming, 'Carol');
+  assert.deepEqual(toInsert.map((record) => `${record.person} ${record.date}`), ['Carol 2026-10-02']);
+  assert.equal(duplicates, 1);
+  assert.equal(others, 2);
+});
+
 test('importing into an empty account inserts everything, and a second import inserts nothing', () => {
   const incoming = [row(), row({ person:'Allen' })];
   assert.equal(B.planImport([], incoming).toInsert.length, 2);

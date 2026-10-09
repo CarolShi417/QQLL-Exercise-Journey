@@ -27,16 +27,18 @@
   }
 
   // Multiset match: two identical runs on the same day in the backup but one in the app → import one.
+  // With `person`, only that person's records are imported (accounts may only log their own); the rest are counted in `others`.
   function recordKey(record) { return `${record.person}|${record.activity}|${record.minutes}|${record.date}`; }
-  function planImport(existing, incoming) {
+  function planImport(existing, incoming, person = null) {
     const counts = new Map();
     existing.forEach((record) => counts.set(recordKey(record), (counts.get(recordKey(record)) || 0) + 1));
-    const toInsert = []; let duplicates = 0;
+    const toInsert = []; let duplicates = 0; let others = 0;
     incoming.forEach((record) => {
+      if (person && record.person !== person) { others += 1; return; }
       const left = counts.get(recordKey(record)) || 0;
       if (left > 0) { counts.set(recordKey(record), left - 1); duplicates += 1; } else toInsert.push(record);
     });
-    return { toInsert, duplicates };
+    return { toInsert, duplicates, others };
   }
 
   const api = { parseBackup, planImport };

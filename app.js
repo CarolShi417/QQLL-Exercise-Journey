@@ -101,7 +101,7 @@ function pixelHtml(day, level, label) {
   return day.future ? `<i class="${classes}"></i>` : `<i class="${classes}" data-date="${day.key}" title="${Q.escapeHtml(label)}"></i>`;
 }
 function habitCardHtml(card) {
-  const checkin = card.checkin ? `<button class="round-button" type="button" data-checkin="${card.checkin}" aria-label="给 ${card.checkin} 打卡">${icon('plus')}</button>` : '';
+  const checkin = card.checkin ? `<button class="round-button" type="button" data-checkin aria-label="新增我的打卡">${icon('plus')}</button>` : '';
   return `<article class="habit-card ${card.scope}">
     <header class="habit-head"><span class="habit-tile">${card.tile}</span><div class="habit-title"><strong>${card.title}</strong><span>${card.subtitle}</span></div>${checkin}</header>
     <div class="pixel-grid" role="img" aria-label="${Q.escapeHtml(card.gridLabel)}">${card.pixels}</div>
@@ -135,7 +135,7 @@ function renderHome() {
   Q.PEOPLE.forEach((person) => {
     const activeDays = G.personDays(entries, person);
     cards.push(habitCardHtml({
-      scope:`is-${person.toLowerCase()}`, tile:Q.catHtml(person), checkin:person,
+      scope:`is-${person.toLowerCase()}`, tile:Q.catHtml(person), checkin:me?.person === person ? person : null,
       title:`${person} <em>${personTitle(person)}</em>`,
       subtitle:`本周 ${weekSessions[person]} 次 · ${number(weekCalories[person])} kcal`,
       gridLabel:`${person} 最近 ${HEATMAP_WEEKS} 周的运动热力图，共 ${activeDays.size} 天有运动`,
@@ -284,18 +284,20 @@ async function deleteRecord(id) {
 }
 
 // ---------- check-in ----------
-function setPerson(person) {
-  document.querySelectorAll('.person-option').forEach((option) => { const input = option.querySelector('input'); input.checked = input.value === person; option.classList.toggle('is-selected', input.checked); });
-}
 function updatePreview() { const calories = Q.calculateCalories($('#activity').value, Number($('#minutes').value) || 0); $('#caloriePreview').textContent = number(calories); $('#xpPreview').textContent = number(Math.floor(Q.experience(calories))); }
-function resetCheckinForm(person = me?.person || 'Carol') {
+// Accounts may only log their own workouts (enforced by the workouts_own_person trigger), so there is no person picker.
+function resetCheckinForm() {
   $('#activityForm').reset();
   $('#minutes').value = 30;
   $('#workoutDate').value = Q.dateKey(new Date());
   $('#workoutDate').max = Q.dateKey(new Date());
-  setPerson(person); updatePreview();
+  const person = me?.person || 'Carol';
+  $('#checkinWho').className = `checkin-who is-${person.toLowerCase()}`;
+  $('#checkinTile').innerHTML = Q.catHtml(person);
+  $('#checkinName').textContent = person;
+  updatePreview();
 }
-function openCheckin(person) { resetCheckinForm(person); $('#checkinDialog').showModal(); }
+function openCheckin() { resetCheckinForm(); $('#checkinDialog').showModal(); }
 
 // ---------- session ----------
 function subscribeToChanges() {
@@ -334,11 +336,12 @@ async function importRecords(file) {
   let plan;
   try {
     const { records, invalid } = window.QQLLBackup.parseBackup(await file.text());
-    plan = { ...window.QQLLBackup.planImport(entries, records), invalid, total:records.length + invalid };
+    plan = { ...window.QQLLBackup.planImport(entries, records, me.person), invalid, total:records.length + invalid };
   } catch (error) { showToast(error.message); return; }
-  if (!plan.toInsert.length) { showToast(`没有需要导入的新记录（已存在 ${plan.duplicates} 条${plan.invalid ? `，${plan.invalid} 条格式不对` : ''}）`); return; }
-  const skipped = [plan.duplicates ? `跳过已存在的 ${plan.duplicates} 条` : '', plan.invalid ? `${plan.invalid} 条格式不对` : ''].filter(Boolean).join('，');
-  if (!confirm(`备份里有 ${plan.total} 条记录，将导入 ${plan.toInsert.length} 条${skipped ? `（${skipped}）` : ''}。继续？`)) return;
+  const partner = Q.PEOPLE.find((person) => person !== me.person);
+  const skipped = [plan.duplicates ? `跳过已存在的 ${plan.duplicates} 条` : '', plan.others ? `${plan.others} 条是 ${partner} 的，需要 ${partner} 登录后自己导入` : '', plan.invalid ? `${plan.invalid} 条格式不对` : ''].filter(Boolean).join('，');
+  if (!plan.toInsert.length) { showToast(`没有需要导入的新记录${skipped ? `（${skipped}）` : ''}`); return; }
+  if (!confirm(`备份里有 ${plan.total} 条记录，将导入你的 ${plan.toInsert.length} 条${skipped ? `（${skipped}）` : ''}。继续？`)) return;
   const button = $('#importRecords'); button.disabled = true; showToast('正在导入…', { key:'import' });
   let imported = 0;
   try {
@@ -364,7 +367,7 @@ function exportRecords() {
 async function submitCheckin(event) {
   event.preventDefault();
   const button = event.target.querySelector('button[type="submit"]');
-  const person = document.querySelector('input[name="person"]:checked').value;
+  const person = me.person;
   const minutes = Number($('#minutes').value);
   const activity = $('#activity').value;
   const calories = Q.calculateCalories(activity, minutes);
@@ -405,7 +408,7 @@ function bindUi() {
   $('#closeCheckin').addEventListener('click', () => $('#checkinDialog').close());
   $('#habitList').addEventListener('click', (event) => {
     const checkin = event.target.closest('[data-checkin]');
-    if (checkin) { openCheckin(checkin.dataset.checkin); return; }
+    if (checkin) { openCheckin(); return; }
     const pixel = event.target.closest('[data-date]');
     if (pixel) { openCalendarAt(pixel.dataset.date); return; }
     if (event.target.closest('[data-open-calendar]')) showView('records');
@@ -413,7 +416,6 @@ function bindUi() {
   $('#calendar').addEventListener('click', (event) => { const day = event.target.closest('[data-date]'); if (!day) return; selectedDate = day.dataset.date; renderCalendar(); renderDayRecords(); });
   $('#dayRecords').addEventListener('click', (event) => { const remove = event.target.closest('[data-delete]'); if (remove) deleteRecord(remove.dataset.delete); });
   document.querySelectorAll('[data-badge-owner]').forEach((button) => button.addEventListener('click', () => { badgeOwner = button.dataset.badgeOwner; renderAchievements(); }));
-  document.querySelectorAll('.person-option input').forEach((input) => input.addEventListener('change', () => setPerson(input.value)));
   $('#activity').addEventListener('change', updatePreview);
   $('#minutes').addEventListener('input', updatePreview);
   $('#activityForm').addEventListener('submit', submitCheckin);

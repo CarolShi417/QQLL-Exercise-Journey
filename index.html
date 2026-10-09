@@ -140,10 +140,7 @@
     <dialog class="checkin-dialog" id="checkinDialog">
       <form class="checkin-form" id="activityForm">
         <div class="dialog-top"><strong>新增打卡</strong><button class="icon-button" id="closeCheckin" type="button" aria-label="关闭"><svg class="icon"><use href="#i-x"/></svg></button></div>
-        <div class="person-picker">
-          <label class="person-option is-carol is-selected"><input type="radio" name="person" value="Carol" checked /><span class="habit-tile"><img class="sprite" src="icons/pixel/cat-carol.svg" alt="" /></span>Carol</label>
-          <label class="person-option is-allen"><input type="radio" name="person" value="Allen" /><span class="habit-tile"><img class="sprite" src="icons/pixel/cat-allen.svg" alt="" /></span>Allen</label>
-        </div>
+        <div class="checkin-who" id="checkinWho"><span class="habit-tile" id="checkinTile"></span><span><strong id="checkinName"></strong><small>只能给自己打卡</small></span></div>
         <label>运动项目<select id="activity" required><option value="跑步">跑步</option><option value="无氧/力量">无氧/力量</option><option value="游泳">游泳</option><option value="骑行">骑行</option><option value="瑜伽">瑜伽</option></select></label>
         <label>运动日期<input id="workoutDate" type="date" required /></label>
         <label>运动时间（分钟）<input id="minutes" type="number" inputmode="numeric" min="1" max="1440" value="30" required /></label>
