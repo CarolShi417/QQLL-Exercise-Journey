@@ -4,6 +4,7 @@ const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_JSN0j-Lr3IbIiH2eGT5elg_5LhLHIDh
 const LEGACY_STORAGE_KEYS = ['ca-exercise-journey-v1', 'ca-exercise-journey-supabase-migrated-v1'];
 const PAGE_SIZE = 1000;
 const HEATMAP_WEEKS = 22;
+const RECORD_COLUMNS = 'id,person,activity,minutes,calories,workout_date,created_at,created_by';
 const $ = (selector) => document.querySelector(selector);
 const Q = window.QQLL;
 const G = window.QQLLGame;
@@ -16,11 +17,15 @@ let selectedDate = null;
 let realtimeChannel = null;
 let reloadTimer = null;
 let session = 0;
+let badgeOwner = null;
+let freshPixel = null;
 
 function number(value) { return new Intl.NumberFormat('zh-CN').format(value); }
 function icon(name) { return `<svg class="icon" aria-hidden="true"><use href="#i-${name}"/></svg>`; }
 function recordId(entry) { return String(entry.id); }
-function appEntry(row) { return { id:row.id, person:row.person, activity:row.activity, minutes:row.minutes, calories:row.calories, date:row.workout_date, createdAt:new Date(row.created_at).getTime() }; }
+function appEntry(row) { return { id:row.id, person:row.person, activity:row.activity, minutes:row.minutes, calories:row.calories, date:row.workout_date, createdAt:new Date(row.created_at).getTime(), createdBy:row.created_by }; }
+// Mirrors the delete policy: records you created, or records logged under your name.
+function canDelete(entry) { return !!me && (entry.createdBy === me.id || entry.person === me.person); }
 function errorText(error) {
   const message = error?.message || String(error);
   if (/Invalid login credentials/i.test(message)) return '邮箱或密码不对';
@@ -29,12 +34,29 @@ function errorText(error) {
   return message;
 }
 
-function showToast(text) {
-  const toast = $('#toast');
+const toastQueue = [];
+function showToast(text, { celebrate = false } = {}) {
+  toastQueue.push({ text, celebrate });
+  if (toastQueue.length === 1) playToast();
+}
+function playToast() {
+  const toast = $('#toast'); const { text, celebrate } = toastQueue[0];
   toast.textContent = text;
+  toast.classList.toggle('is-celebrate', celebrate);
   toast.classList.add('show');
-  clearTimeout(showToast.timer);
-  showToast.timer = setTimeout(() => toast.classList.remove('show'), 2600);
+  if (celebrate) pixelBurst(toast);
+  setTimeout(() => { toast.classList.remove('show'); setTimeout(() => { toastQueue.shift(); if (toastQueue.length) playToast(); }, 220); }, celebrate ? 3000 : 2600);
+}
+function pixelBurst(host) {
+  const burst = document.createElement('span'); burst.className = 'burst';
+  for (let i = 0; i < 14; i += 1) {
+    const bit = document.createElement('i'); const angle = (Math.PI * 2 * i) / 14;
+    bit.className = ['is-carol', 'is-allen', 'is-both'][i % 3];
+    bit.style.setProperty('--dx', `${Math.round(Math.cos(angle) * (60 + (i % 4) * 14))}px`);
+    bit.style.setProperty('--dy', `${Math.round(Math.sin(angle) * (34 + (i % 3) * 12))}px`);
+    burst.append(bit);
+  }
+  host.append(burst); setTimeout(() => burst.remove(), 1000);
 }
 function setAuthMessage(message, isError = false) { const element = $('#authMessage'); element.textContent = message; element.classList.toggle('is-error', isError); }
 function showAuthScreen() { $('#authScreen').classList.remove('is-hidden'); }
@@ -45,6 +67,7 @@ function showView(name) {
 }
 
 // ---------- home ----------
+function personTitle(person) { const level = Q.currentLevel(Q.experience(Q.totals(entries)[person])).level; return `Lv.${level} · ${G.levelTitle(level)}`; }
 function pixelHtml(day, level, label) {
   const classes = ['px', `l${level}`, day.today ? 'is-today' : '', day.future ? 'is-future' : ''].filter(Boolean).join(' ');
   return day.future ? `<i class="${classes}"></i>` : `<i class="${classes}" data-date="${day.key}" title="${Q.escapeHtml(label)}"></i>`;
@@ -57,28 +80,40 @@ function habitCardHtml(card) {
     <footer class="habit-foot"><span class="streak ${card.streak.current ? '' : 'is-cold'}">${icon('flame')}${card.streakLabel} ${card.streak.current} 天</span><span>最长 ${card.streak.longest} 天</span><button class="icon-button" type="button" data-open-calendar aria-label="查看日历">${icon('calendar')}</button></footer>
   </article>`;
 }
+function bossCardHtml(boss, wins) {
+  // Overkill still splits the bar by each person's share of the damage.
+  const scale = Math.max(boss.hp, boss.damage.Carol + boss.damage.Allen);
+  const carolShare = boss.damage.Carol / scale * 100;
+  const allenShare = boss.damage.Allen / scale * 100;
+  const status = boss.defeated ? `已击败 · 本周还剩 ${boss.daysLeft} 天` : boss.daysLeft ? `剩余 HP ${number(boss.remaining)} / ${number(boss.hp)} · 还剩 ${boss.daysLeft} 天` : `剩余 HP ${number(boss.remaining)} · 今天是最后一天`;
+  return `<article class="habit-card boss-card ${boss.defeated ? 'is-defeated' : ''}">
+    <header class="habit-head"><span class="habit-tile boss-tile">${icon(boss.defeated ? 'crown' : 'sword')}</span><div class="habit-title"><strong>本周 Boss · ${boss.name}</strong><span>${status}</span></div></header>
+    <div class="boss-bar" role="img" aria-label="Carol 造成 ${boss.damage.Carol} 伤害，Allen 造成 ${boss.damage.Allen} 伤害，共 ${boss.hp} HP"><span class="boss-hit is-carol" data-share="${carolShare}"></span><span class="boss-hit is-allen" data-share="${allenShare}"></span></div>
+    <footer class="habit-foot"><span><i class="dot is-carol"></i> Carol ${number(boss.damage.Carol)}</span><span><i class="dot is-allen"></i> Allen ${number(boss.damage.Allen)}</span><span class="boss-wins">已击败 ${wins} 只</span></footer>
+  </article>`;
+}
 function renderHome() {
   const today = new Date();
   const weekly = entries.filter((entry) => Q.isInWeek(entry, today));
   const weekCalories = Q.totals(weekly);
   const weekSessions = Q.sessions(weekly);
-  const lifetime = Q.totals(entries);
   const daily = G.dailyCalories(entries);
   const days = G.heatmapDays(today, HEATMAP_WEEKS);
   const { monday, sunday } = Q.weekRange(today);
   const format = new Intl.DateTimeFormat('zh-CN', { month:'numeric', day:'numeric' });
   $('#weekPeriod').textContent = `${format.format(monday)} — ${format.format(sunday)} 本周`;
 
-  const cards = Q.PEOPLE.map((person) => {
+  const cards = [bossCardHtml(G.weeklyBoss(entries, today), G.bossWins(entries, today))];
+  Q.PEOPLE.forEach((person) => {
     const activeDays = G.personDays(entries, person);
-    return habitCardHtml({
+    cards.push(habitCardHtml({
       scope:`is-${person.toLowerCase()}`, tile:person[0], checkin:person,
-      title:`${person} <em>Lv.${Q.currentLevel(Q.experience(lifetime[person])).level}</em>`,
+      title:`${person} <em>${personTitle(person)}</em>`,
       subtitle:`本周 ${weekSessions[person]} 次 · ${number(weekCalories[person])} kcal`,
       gridLabel:`${person} 最近 ${HEATMAP_WEEKS} 周的运动热力图，共 ${activeDays.size} 天有运动`,
       pixels:days.map((day) => { const calories = daily.get(day.key)?.[person] || 0; return pixelHtml(day, G.heatLevel(calories), `${day.key} · ${number(calories)} kcal`); }).join(''),
       streak:G.streaks(activeDays, today), streakLabel:'连续',
-    });
+    }));
   });
   const together = G.togetherDays(entries);
   cards.push(habitCardHtml({
@@ -90,36 +125,40 @@ function renderHome() {
   }));
   const host = $('#habitList');
   host.innerHTML = cards.join('');
+  // CSP forbids inline style attributes, so sizes go through CSSOM.
   host.querySelectorAll('.pixel-grid').forEach((grid) => grid.style.setProperty('--weeks', HEATMAP_WEEKS));
+  host.querySelectorAll('[data-share]').forEach((bar) => { bar.style.width = `${bar.dataset.share}%`; });
+  highlightFreshPixel();
 }
 
 // ---------- calendar ----------
 function entriesOn(date) { return entries.filter((entry) => entry.date === date); }
-function entryPeople(daily) { const people = new Set(daily.map((entry) => entry.person)); return people.size === 2 ? 'both' : people.has('Carol') ? 'carol' : people.has('Allen') ? 'allen' : ''; }
 function renderCalendar() {
   const year = displayedMonth.getFullYear();
   const month = displayedMonth.getMonth();
   const firstCell = new Date(year, month, 1 - (new Date(year, month, 1).getDay() + 6) % 7);
+  const todayKey = Q.dateKey(new Date());
+  const daily = G.dailyCalories(entries);
   $('#calendarMonth').textContent = new Intl.DateTimeFormat('zh-CN', { year:'numeric', month:'long' }).format(displayedMonth);
   let html = '';
   for (let i = 0; i < 42; i += 1) {
     const date = new Date(firstCell.getFullYear(), firstCell.getMonth(), firstCell.getDate() + i);
     const key = Q.dateKey(date);
-    const daily = entriesOn(key);
-    const people = entryPeople(daily);
-    const summary = daily.slice(0, 2).map((entry) => Q.calendarEntryHtml(entry, key)).join('') + (daily.length > 2 ? `<span class="calendar-more">+${daily.length - 2}</span>` : '');
-    const classes = ['day', date.getMonth() === month ? '' : 'other-month', people ? `has-${people}` : '', selectedDate === key ? 'is-selected' : ''].filter(Boolean).join(' ');
-    html += `<button class="${classes}" data-date="${key}" type="button"><span class="day-number">${date.getDate()}</span>${summary}</button>`;
+    const totals = daily.get(key) || { Carol:0, Allen:0 };
+    const classes = ['day', date.getMonth() === month ? '' : 'other-month', key === todayKey ? 'is-today' : '', selectedDate === key ? 'is-selected' : ''].filter(Boolean).join(' ');
+    const minis = Q.PEOPLE.map((person) => `<i class="mini is-${person.toLowerCase()} l${G.heatLevel(totals[person])}"></i>`).join('');
+    html += `<button class="${classes}" data-date="${key}" type="button" aria-label="${key}"><span class="day-number">${date.getDate()}</span><span class="day-pixels">${minis}</span></button>`;
   }
   $('#calendar').innerHTML = html;
-  document.querySelectorAll('.day').forEach((day) => day.addEventListener('click', () => { selectedDate = day.dataset.date; renderCalendar(); renderDayRecords(); }));
-  bindCalendarRecordActions();
 }
 function renderDayRecords() {
   const host = $('#dayRecords');
   if (!selectedDate) { host.innerHTML = '<p>点按日期，查看当天记录</p>'; return; }
   const daily = entriesOn(selectedDate);
-  host.innerHTML = daily.length ? daily.map(Q.dayEntryHtml).join('') : `<p>${Q.escapeHtml(selectedDate)} 没有运动记录</p>`;
+  const heading = new Intl.DateTimeFormat('zh-CN', { month:'long', day:'numeric', weekday:'short' }).format(new Date(`${selectedDate}T00:00:00`));
+  host.innerHTML = daily.length
+    ? `<h3 class="day-heading">${heading} · ${daily.length} 条记录</h3>${daily.map((entry) => Q.dayEntryHtml(entry, canDelete(entry))).join('')}`
+    : `<p>${heading} 没有运动记录</p>`;
 }
 function openCalendarAt(key) {
   displayedMonth = Q.workoutMonth(key);
@@ -128,26 +167,68 @@ function openCalendarAt(key) {
 }
 
 // ---------- achievements ----------
+function levelCardHtml(person) {
+  const xp = Math.floor(Q.experience(Q.totals(entries)[person]));
+  const level = Q.currentLevel(xp);
+  const share = (xp - level.start) / (level.next - level.start) * 100;
+  return `<article class="card level-card is-${person.toLowerCase()}">
+    <div class="level-row"><span class="habit-tile">${person[0]}</span><div class="level-copy"><strong>${person} <em>Lv.${level.level}</em></strong><span>${G.levelTitle(level.level)}</span></div><b>${number(xp)} / ${number(level.next)} XP</b></div>
+    <div class="progress-track"><div class="progress-bar" data-share="${share}"></div></div>
+    <p class="level-next">再获得 ${number(level.next - xp)} XP 升到 Lv.${level.level + 1} · ${G.levelTitle(level.level + 1)}</p>
+  </article>`;
+}
+function badgeHtml(badge, scope) {
+  const state = badge.unlocked ? '已解锁' : `${number(badge.value)} / ${number(badge.target)}`;
+  return `<div class="badge ${scope} ${badge.unlocked ? 'is-unlocked' : ''}"><span class="badge-icon">${icon(badge.unlocked ? badge.icon : 'lock')}</span><strong>${badge.name}</strong><span>${badge.desc}</span><em>${state}</em></div>`;
+}
 function renderAchievements() {
-  const t = Q.totals(entries);
-  Q.PEOPLE.forEach((person) => {
-    const xp = Q.experience(t[person]);
-    const level = Q.currentLevel(xp);
-    const prefix = person.toLowerCase();
-    const progress = level.next ? (xp - level.start) / (level.next - level.start) * 100 : 100;
-    $(`#${prefix}Level`).textContent = `Lv.${level.level}`;
-    $(`#${prefix}ProgressText`).textContent = level.next ? `${number(xp)} / ${number(level.next)} XP` : `${number(xp)} XP · 满级`;
-    $(`#${prefix}Progress`).style.width = `${Math.min(100, progress)}%`;
-  });
+  const host = $('#levelList');
+  host.innerHTML = Q.PEOPLE.map(levelCardHtml).join('');
+  host.querySelectorAll('[data-share]').forEach((bar) => { bar.style.width = `${bar.dataset.share}%`; });
+  const owner = badgeOwner || me?.person || 'Carol';
+  document.querySelectorAll('[data-badge-owner]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.badgeOwner === owner)));
+  const badges = owner === 'couple' ? G.coupleBadges(entries, new Date()) : G.personalBadges(entries, owner);
+  const scope = owner === 'couple' ? 'is-both' : `is-${owner.toLowerCase()}`;
+  $('#badgeGrid').innerHTML = badges.map((badge) => badgeHtml(badge, scope)).join('');
   $('#accountInfo').textContent = me ? `当前账号：${me.person}` : '';
 }
 function render() { renderHome(); renderCalendar(); renderDayRecords(); renderAchievements(); }
+
+// ---------- celebrations ----------
+// Snapshot before and after a save; anything newly earned becomes a celebration toast.
+function progressSnapshot() {
+  const today = new Date();
+  const unlocked = (list) => new Set(list.filter((badge) => badge.unlocked).map((badge) => badge.name));
+  return {
+    levels:Object.fromEntries(Q.PEOPLE.map((person) => [person, Q.currentLevel(Q.experience(Q.totals(entries)[person])).level])),
+    badges:Object.fromEntries([...Q.PEOPLE.map((person) => [person, unlocked(G.personalBadges(entries, person))]), ['一起', unlocked(G.coupleBadges(entries, today))]]),
+    boss:G.weeklyBoss(entries, today),
+  };
+}
+function celebrationsBetween(before, after) {
+  const messages = [];
+  if (!before.boss.defeated && after.boss.defeated) messages.push(`击败了本周 Boss「${after.boss.name}」`);
+  Q.PEOPLE.forEach((person) => { if (after.levels[person] > before.levels[person]) messages.push(`${person} 升到 Lv.${after.levels[person]} · ${G.levelTitle(after.levels[person])}`); });
+  // One toast per owner, however many badges they just earned, so a big save doesn't queue a minute of toasts.
+  Object.entries(after.badges).forEach(([owner, names]) => {
+    const fresh = [...names].filter((name) => !before.badges[owner].has(name));
+    if (fresh.length) messages.push(`${owner === '一起' ? '你们' : `${owner} `}解锁徽章${fresh.map((name) => `「${name}」`).join('')}`);
+  });
+  return messages;
+}
+// Realtime reloads re-render the cards right after a save; a negative delay keeps the pop animation continuous.
+function highlightFreshPixel() {
+  if (!freshPixel) return;
+  const elapsed = Date.now() - freshPixel.at;
+  if (elapsed > 900) { freshPixel = null; return; }
+  document.querySelectorAll(`.habit-card.is-${freshPixel.person.toLowerCase()} .px[data-date="${freshPixel.date}"], .habit-card.is-both .px[data-date="${freshPixel.date}"]:not(.l0)`).forEach((pixel) => { pixel.style.animationDelay = `-${elapsed}ms`; pixel.classList.add('is-new'); });
+}
 
 // ---------- data ----------
 async function fetchAllRows() {
   const rows = [];
   for (let from = 0; ; from += PAGE_SIZE) {
-    const { data, error } = await supabaseClient.from('workouts').select('id,person,activity,minutes,calories,workout_date,created_at').order('workout_date', { ascending:false }).order('created_at', { ascending:false }).order('id', { ascending:false }).range(from, from + PAGE_SIZE - 1);
+    const { data, error } = await supabaseClient.from('workouts').select(RECORD_COLUMNS).order('workout_date', { ascending:false }).order('created_at', { ascending:false }).order('id', { ascending:false }).range(from, from + PAGE_SIZE - 1);
     if (error) throw error;
     rows.push(...data);
     if (data.length < PAGE_SIZE) return rows;
@@ -160,7 +241,7 @@ async function loadRemoteRecords() {
 }
 function scheduleReload() { clearTimeout(reloadTimer); reloadTimer = setTimeout(() => { if (me) loadRemoteRecords().catch((error) => console.error(error)); }, 300); }
 async function addWorkout(entry) {
-  const { data:row, error } = await supabaseClient.from('workouts').insert({ person:entry.person, activity:entry.activity, minutes:entry.minutes, calories:entry.calories, workout_date:entry.date }).select('id,person,activity,minutes,calories,workout_date,created_at').single();
+  const { data:row, error } = await supabaseClient.from('workouts').insert({ person:entry.person, activity:entry.activity, minutes:entry.minutes, calories:entry.calories, workout_date:entry.date }).select(RECORD_COLUMNS).single();
   if (error) throw error;
   if (!entries.some((item) => item.id === row.id)) entries.push(appEntry(row));
   return appEntry(row);
@@ -173,25 +254,12 @@ async function deleteRecord(id) {
   if (!data.length) { showToast('只能删除自己的记录，或自己记下的记录'); return; }
   entries = entries.filter((entry) => entry.id !== record.id); render(); showToast('记录已删除');
 }
-function bindCalendarRecordActions() {
-  document.querySelectorAll('.calendar-entry').forEach((item) => {
-    let timer = null; let longPressed = false;
-    const clear = () => { clearTimeout(timer); timer = null; };
-    const trigger = () => { if (longPressed) return; clear(); longPressed = true; deleteRecord(item.dataset.entryId); };
-    item.addEventListener('pointerdown', (event) => { event.stopPropagation(); longPressed = false; timer = setTimeout(trigger, 600); });
-    item.addEventListener('pointerup', clear);
-    item.addEventListener('pointerleave', clear);
-    item.addEventListener('pointercancel', clear);
-    item.addEventListener('click', (event) => { event.stopPropagation(); if (longPressed) return; selectedDate = item.dataset.date; renderCalendar(); renderDayRecords(); });
-    item.addEventListener('contextmenu', (event) => { event.preventDefault(); event.stopPropagation(); trigger(); });
-  });
-}
 
 // ---------- check-in ----------
 function setPerson(person) {
   document.querySelectorAll('.person-option').forEach((option) => { const input = option.querySelector('input'); input.checked = input.value === person; option.classList.toggle('is-selected', input.checked); });
 }
-function updatePreview() { const calories = Q.calculateCalories($('#activity').value, Number($('#minutes').value) || 0); $('#caloriePreview').textContent = number(calories); $('#xpPreview').textContent = number(Q.experience(calories)); }
+function updatePreview() { const calories = Q.calculateCalories($('#activity').value, Number($('#minutes').value) || 0); $('#caloriePreview').textContent = number(calories); $('#xpPreview').textContent = number(Math.floor(Q.experience(calories))); }
 function resetCheckinForm(person = me?.person || 'Carol') {
   $('#activityForm').reset();
   $('#minutes').value = 30;
@@ -224,7 +292,7 @@ async function startAuthenticatedApp(user) {
   }
 }
 function stopApp() {
-  session += 1; me = null; entries = []; selectedDate = null; clearTimeout(reloadTimer);
+  session += 1; me = null; entries = []; selectedDate = null; badgeOwner = null; freshPixel = null; clearTimeout(reloadTimer);
   if (realtimeChannel) { supabaseClient.removeChannel(realtimeChannel); realtimeChannel = null; }
   if ($('#checkinDialog').open) $('#checkinDialog').close();
   render(); showView('today'); showAuthScreen();
@@ -245,11 +313,14 @@ async function submitCheckin(event) {
   if (!minutes || !calories || !workoutDate) return;
   button.disabled = true;
   try {
+    const before = progressSnapshot();
     const saved = await addWorkout({ person, activity, minutes, calories, date:workoutDate });
     $('#checkinDialog').close();
     displayedMonth = Q.workoutMonth(saved.date); selectedDate = saved.date;
+    freshPixel = { person:saved.person, date:saved.date, at:Date.now() };
     render();
-    showToast(`打卡已保存，获得 ${number(Q.experience(saved.calories))} XP`);
+    showToast(`打卡已保存，获得 ${number(Math.floor(Q.experience(saved.calories)))} XP`);
+    celebrationsBetween(before, progressSnapshot()).forEach((message) => showToast(message, { celebrate:true }));
   } catch (error) {
     showToast(`保存失败：${errorText(error)}`);
   } finally {
@@ -279,6 +350,9 @@ function bindUi() {
     if (pixel) { openCalendarAt(pixel.dataset.date); return; }
     if (event.target.closest('[data-open-calendar]')) showView('records');
   });
+  $('#calendar').addEventListener('click', (event) => { const day = event.target.closest('[data-date]'); if (!day) return; selectedDate = day.dataset.date; renderCalendar(); renderDayRecords(); });
+  $('#dayRecords').addEventListener('click', (event) => { const remove = event.target.closest('[data-delete]'); if (remove) deleteRecord(remove.dataset.delete); });
+  document.querySelectorAll('[data-badge-owner]').forEach((button) => button.addEventListener('click', () => { badgeOwner = button.dataset.badgeOwner; renderAchievements(); }));
   document.querySelectorAll('.person-option input').forEach((input) => input.addEventListener('change', () => setPerson(input.value)));
   $('#activity').addEventListener('change', updatePreview);
   $('#minutes').addEventListener('input', updatePreview);
