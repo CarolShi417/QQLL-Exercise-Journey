@@ -7,7 +7,7 @@ import { dirname, join } from 'node:path';
 import subsetFont from 'subset-font';
 
 const root = join(dirname(new URL(import.meta.url).pathname.replace(/^\/(\w:)/, '$1')), '..');
-const SOURCES = ['index.html', 'app.js', 'game.js', 'logic.js'];
+const SOURCES = ['index.html', 'app.js', 'game.js', 'logic.js', 'theme.js'];
 // Characters produced at runtime that never appear literally in the sources (dates, numbers, Intl output).
 const RUNTIME = '0123456789年月日周一二三四五六七八九十，。、·—…：；！？（）「」《》％+-/×÷:.,%';
 
