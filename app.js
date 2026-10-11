@@ -120,15 +120,56 @@ function cycleCardHtml(cycle) {
     in:`经期第 ${cycle.dayOfPeriod} 天`,
     after:cycle.last ? `上次经期 ${shortDate(cycle.last.start)}${cycle.last.length > 1 ? `–${shortDate(cycle.last.end)}` : ''}，共 ${cycle.last.length} 天` : '',
   }[cycle.status];
-  const marked = periodKeys(CYCLE_PERSON).includes(todayKey);
   const action = mine
-    ? `<button class="${marked ? 'link-button' : 'primary-button is-period'}" type="button" data-period-toggle="${todayKey}">${marked ? '今天不是经期' : '今天是经期'}</button>`
+    ? '<button class="primary-button is-period" type="button" data-period-open>记录经期</button>'
     : `<p class="cycle-note">由 ${CYCLE_PERSON} 记录</p>`;
   return `<article class="habit-card cycle-card">
     <header class="habit-head"><span class="habit-tile cycle-tile">${icon('paw')}</span><div class="habit-title"><strong>${CYCLE_PERSON} 的经期</strong><span>${status}</span></div></header>
     ${action}
-    ${mine ? '<p class="cycle-note">也可以在日历里补记或取消任意一天。</p>' : ''}
+    ${mine ? '<p class="cycle-note">选开始和结束日期，一次标记整段；日历里也能单独修改某一天。</p>' : ''}
   </article>`;
+}
+// Range sheet: pick start and end, mark (or unmark) every day in between at once.
+function periodRange() { return Cy.rangeDays($('#periodStart').value, $('#periodEnd').value, new Date()); }
+function updatePeriodSummary() {
+  const range = periodRange();
+  const marked = range.days ? range.days.filter((key) => periodKeys(CYCLE_PERSON).includes(key)).length : 0;
+  $('#periodSummary').textContent = range.error || `${shortDate(range.days[0])}${range.days.length > 1 ? ` – ${shortDate(range.days[range.days.length - 1])}` : ''}，共 ${range.days.length} 天${marked ? `（其中 ${marked} 天已标记）` : ''}`;
+  $('#periodSummary').classList.toggle('is-error', !!range.error);
+}
+function openPeriodSheet() {
+  const todayKey = Q.dateKey(new Date());
+  const cycle = cycleFor(CYCLE_PERSON);
+  $('#periodStart').value = cycle.status === 'in' ? cycle.current.start : todayKey;
+  $('#periodEnd').value = todayKey;
+  $('#periodStart').max = todayKey; $('#periodEnd').max = todayKey;
+  updatePeriodSummary(); $('#periodDialog').showModal();
+}
+async function savePeriodRange(event) {
+  event.preventDefault();
+  if (me?.person !== CYCLE_PERSON || !periodsAvailable) return;
+  const range = periodRange();
+  if (range.error) { updatePeriodSummary(); return; }
+  const missing = range.days.filter((key) => !periodKeys(me.person).includes(key));
+  if (!missing.length) { showToast('这段日期已经都标记过了', { key:'period' }); $('#periodDialog').close(); return; }
+  const { error } = await supabaseClient.from('period_days').insert(missing.map((key) => ({ person:me.person, period_date:key })));
+  if (error) { showToast(`保存失败：${errorText(error)}`, { key:'period' }); return; }
+  periodDays = [...periodDays, ...missing.map((date) => ({ person:me.person, date }))];
+  $('#periodDialog').close(); render();
+  showToast(`已标记 ${shortDate(range.days[0])}–${shortDate(range.days[range.days.length - 1])} 为经期`, { key:'period' });
+}
+async function clearPeriodRange() {
+  if (me?.person !== CYCLE_PERSON || !periodsAvailable) return;
+  const range = periodRange();
+  if (range.error) { updatePeriodSummary(); return; }
+  const marked = range.days.filter((key) => periodKeys(me.person).includes(key));
+  if (!marked.length) { showToast('这段日期里没有经期标记', { key:'period' }); return; }
+  if (!confirm(`取消 ${shortDate(range.days[0])}–${shortDate(range.days[range.days.length - 1])} 之间 ${marked.length} 天的经期标记？`)) return;
+  const { error } = await supabaseClient.from('period_days').delete().eq('person', me.person).gte('period_date', range.days[0]).lte('period_date', range.days[range.days.length - 1]);
+  if (error) { showToast(`保存失败：${errorText(error)}`, { key:'period' }); return; }
+  periodDays = periodDays.filter((period) => !(period.person === me.person && marked.includes(period.date)));
+  $('#periodDialog').close(); render();
+  showToast(`已取消 ${marked.length} 天的经期标记`, { key:'period' });
 }
 async function togglePeriodDay(key) {
   if (me?.person !== CYCLE_PERSON || !periodsAvailable) return;
@@ -145,8 +186,10 @@ async function togglePeriodDay(key) {
 // ---------- home ----------
 function personTitle(person) { const level = Q.currentLevel(Q.experience(Q.totals(entries)[person])).level; return `Lv.${level} · ${G.levelTitle(level)}`; }
 function pixelHtml(day, level, label, extra = '') {
-  const classes = ['px', `l${level}`, day.today ? 'is-today' : '', day.future ? 'is-future' : '', extra].filter(Boolean).join(' ');
-  return day.future ? `<i class="${classes}"></i>` : `<i class="${classes}" data-date="${day.key}" title="${Q.escapeHtml(label)}"></i>`;
+  const classes = ['px', `l${level}`, day.today ? 'is-today' : '', day.future ? 'is-future' : ''].filter(Boolean).join(' ');
+  if (day.future) return `<i class="${classes}"></i>`;
+  if (extra === 'is-period') return `<span class="px-box" data-date="${day.key}" title="${Q.escapeHtml(label)}"><i class="${classes}"></i></span>`;
+  return `<i class="${classes}" data-date="${day.key}" title="${Q.escapeHtml(label)}"></i>`;
 }
 function habitCardHtml(card) {
   const checkin = card.checkin ? `<button class="round-button" type="button" data-checkin aria-label="新增我的打卡">${icon('plus')}</button>` : '';
@@ -229,8 +272,8 @@ function renderCalendar() {
     const date = new Date(firstCell.getFullYear(), firstCell.getMonth(), firstCell.getDate() + i);
     const key = Q.dateKey(date);
     const totals = daily.get(key) || { Carol:0, Allen:0 };
-    const classes = ['day', date.getMonth() === month ? '' : 'other-month', key === todayKey ? 'is-today' : '', selectedDate === key ? 'is-selected' : ''].filter(Boolean).join(' ');
-    const minis = Q.PEOPLE.map((person) => `<i class="mini is-${person.toLowerCase()} l${G.heatLevel(totals[person])} ${periodClass(person, key)}"></i>`).join('');
+    const classes = ['day', date.getMonth() === month ? '' : 'other-month', key === todayKey ? 'is-today' : '', selectedDate === key ? 'is-selected' : '', periodClass(CYCLE_PERSON, key) ? 'is-period-day' : ''].filter(Boolean).join(' ');
+    const minis = Q.PEOPLE.map((person) => `<i class="mini is-${person.toLowerCase()} l${G.heatLevel(totals[person])}"></i>`).join('');
     html += `<button class="${classes}" data-date="${key}" type="button" aria-label="${key}"><span class="day-number">${date.getDate()}</span><span class="day-pixels">${minis}</span></button>`;
   }
   $('#calendar').innerHTML = html;
@@ -317,7 +360,9 @@ function highlightFreshPixel() {
   if (!freshPixel) return;
   const elapsed = Date.now() - freshPixel.at;
   if (elapsed > 900) { freshPixel = null; return; }
-  document.querySelectorAll(`.habit-card.is-${freshPixel.person.toLowerCase()} .px[data-date="${freshPixel.date}"], .habit-card.is-both .px[data-date="${freshPixel.date}"]:not(.l0)`).forEach((pixel) => { pixel.style.animationDelay = `-${elapsed}ms`; pixel.classList.add('is-new'); });
+  // On period days data-date sits on the pink box around the paw, so resolve to the paw itself.
+  const cells = document.querySelectorAll(`.habit-card.is-${freshPixel.person.toLowerCase()} [data-date="${freshPixel.date}"], .habit-card.is-both [data-date="${freshPixel.date}"]`);
+  cells.forEach((cell) => { const pixel = cell.classList.contains('px') ? cell : cell.querySelector('.px'); if (!pixel || pixel.classList.contains('l0')) return; pixel.style.animationDelay = `-${elapsed}ms`; pixel.classList.add('is-new'); });
 }
 
 // ---------- data ----------
@@ -404,6 +449,7 @@ function stopApp() {
   session += 1; me = null; entries = []; periodDays = []; periodsAvailable = false; selectedDate = null; badgeOwner = null; freshPixel = null; clearTimeout(reloadTimer);
   if (realtimeChannel) { supabaseClient.removeChannel(realtimeChannel); realtimeChannel = null; }
   if ($('#checkinDialog').open) $('#checkinDialog').close();
+  if ($('#periodDialog').open) $('#periodDialog').close();
   render(); showView('today'); showAuthScreen(); hideSplash();
 }
 // Re-import a JSON backup (from this app or the daily auto-backup). Records already present are skipped,
@@ -491,8 +537,7 @@ function bindUi() {
   $('#themeToggle').addEventListener('click', toggleTheme);
   $('#closeCheckin').addEventListener('click', () => $('#checkinDialog').close());
   $('#habitList').addEventListener('click', (event) => {
-    const periodToggle = event.target.closest('[data-period-toggle]');
-    if (periodToggle) { togglePeriodDay(periodToggle.dataset.periodToggle); return; }
+    if (event.target.closest('[data-period-open]')) { openPeriodSheet(); return; }
     const checkin = event.target.closest('[data-checkin]');
     if (checkin) { openCheckin(); return; }
     const pixel = event.target.closest('[data-date]');
@@ -506,6 +551,11 @@ function bindUi() {
     const remove = event.target.closest('[data-delete]'); if (remove) deleteRecord(remove.dataset.delete);
   });
   document.querySelectorAll('[data-badge-owner]').forEach((button) => button.addEventListener('click', () => { badgeOwner = button.dataset.badgeOwner; renderAchievements(); }));
+  $('#periodForm').addEventListener('submit', savePeriodRange);
+  $('#periodUnmark').addEventListener('click', clearPeriodRange);
+  $('#closePeriod').addEventListener('click', () => $('#periodDialog').close());
+  $('#periodStart').addEventListener('input', updatePeriodSummary);
+  $('#periodEnd').addEventListener('input', updatePeriodSummary);
   $('#activity').addEventListener('change', updatePreview);
   $('#minutes').addEventListener('input', updatePreview);
   $('#activityForm').addEventListener('submit', submitCheckin);

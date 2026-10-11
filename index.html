@@ -105,7 +105,7 @@
           <div class="weekdays"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
           <div class="calendar" id="calendar"></div>
         </div>
-        <div class="legend"><span><i class="dot is-carol"></i>Carol</span><span><i class="dot is-allen"></i>Allen</span><span class="period-legend" hidden><i class="dot is-period"></i>经期</span><span><svg class="icon"><use href="#i-paw"/></svg>颜色越深运动越多</span></div>
+        <div class="legend"><span><i class="dot is-carol"></i>Carol</span><span><i class="dot is-allen"></i>Allen</span><span class="period-legend" hidden><i class="dot is-period"></i>经期（淡粉底）</span><span><svg class="icon"><use href="#i-paw"/></svg>颜色越深运动越多</span></div>
         <div class="day-records" id="dayRecords"><p>点按日期，查看当天记录</p></div>
       </section>
 
@@ -146,6 +146,16 @@
         <label>运动时间（分钟）<input id="minutes" type="number" inputmode="numeric" min="1" max="1440" value="30" required /></label>
         <p class="calorie-preview">预计获得 <strong id="caloriePreview">300</strong> kcal · <strong id="xpPreview">30</strong> XP</p>
         <button class="primary-button" type="submit">保存打卡</button>
+      </form>
+    </dialog>
+    <dialog class="checkin-dialog" id="periodDialog">
+      <form class="checkin-form" id="periodForm">
+        <div class="dialog-top"><strong>记录经期</strong><button class="icon-button" id="closePeriod" type="button" aria-label="关闭"><svg class="icon"><use href="#i-x"/></svg></button></div>
+        <label>开始日期<input id="periodStart" type="date" required /></label>
+        <label>结束日期<input id="periodEnd" type="date" required /></label>
+        <p class="calorie-preview" id="periodSummary"></p>
+        <button class="primary-button is-period" type="submit">标记为经期</button>
+        <button class="link-button is-danger" id="periodUnmark" type="button">取消这段日期的标记</button>
       </form>
     </dialog>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>

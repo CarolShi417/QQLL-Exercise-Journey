@@ -14,6 +14,21 @@ test('marked days group into periods, bridging a single forgotten day', () => {
   assert.deepEqual(C.periodsFromDays([]), []);
 });
 
+test('a date range expands to every day in it, inclusive', () => {
+  assert.deepEqual(C.rangeDays('2026-09-29', '2026-10-02', day(2026, 10, 11)), { days:['2026-09-29', '2026-09-30', '2026-10-01', '2026-10-02'] });
+  assert.deepEqual(C.rangeDays('2026-10-11', '2026-10-11', day(2026, 10, 11)), { days:['2026-10-11'] });
+  assert.deepEqual(C.rangeDays('2025-12-30', '2026-01-02', day(2026, 10, 11)).days.length, 4);
+});
+
+test('invalid ranges explain what is wrong', () => {
+  const today = day(2026, 10, 11);
+  assert.match(C.rangeDays('2026-10-05', '2026-10-01', today).error, /结束日期不能早于开始日期/);
+  assert.match(C.rangeDays('2026-10-10', '2026-10-12', today).error, /不能晚于今天/);
+  assert.match(C.rangeDays('2026-09-01', '2026-09-20', today).error, /最多/);
+  assert.match(C.rangeDays('', '2026-10-01', today).error, /选择/);
+  assert.match(C.rangeDays('2019-12-30', '2020-01-02', today).error, /2020/);
+});
+
 test('no records yet', () => {
   assert.deepEqual(C.cycleSummary([], day(2026, 10, 11)), { status:'none' });
 });
