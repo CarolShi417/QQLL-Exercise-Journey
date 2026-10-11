@@ -85,28 +85,32 @@
     { id:'swim10', name:'不怕水的猫', desc:'游泳 10 次', icon:'swim', metric:'activity:游泳', target:10 },
     { id:'bike20', name:'车筐猫', desc:'骑行 20 次', icon:'bike', metric:'activity:骑行', target:20 },
     { id:'yoga20', name:'猫式伸展', desc:'瑜伽 20 次', icon:'yoga', metric:'activity:瑜伽', target:20 },
+    { id:'gomoku1', name:'初尝胜果', desc:'五子棋赢 1 局', icon:'gamepad', metric:'gomokuWins', target:1 },
+    { id:'gomoku10', name:'棋坛猫王', desc:'五子棋赢 10 局', icon:'chess', metric:'gomokuWins', target:10 },
     { id:'allround', name:'十项全能猫', desc:'5 种运动都完成过', icon:'star', metric:'activityKinds', target:5 },
   ];
   const COUPLE_BADGES = [
     { id:'together1', name:'第一次贴贴', desc:'第一次同一天都打卡', icon:'heart', metric:'togetherDays', target:1 },
     { id:'together10', name:'双猫同行', desc:'一起运动 10 天', icon:'users', metric:'togetherDays', target:10 },
     { id:'togetherStreak7', name:'连体猫', desc:'连续 7 天一起运动', icon:'paw', metric:'togetherStreak', target:7 },
+    { id:'gomokuGames10', name:'棋逢对手', desc:'一起下完 10 局五子棋', icon:'gamepad', metric:'gomokuGames', target:10 },
     { id:'boss1', name:'赶走天敌', desc:'击退 1 个每周天敌', icon:'sword', metric:'bossWins', target:1 },
     { id:'boss10', name:'猫界守护者', desc:'击退 10 个每周天敌', icon:'crown', metric:'bossWins', target:10 },
   ];
   function progress(definitions, stats) {
     return definitions.map((badge) => { const value = Math.min(stats[badge.metric] || 0, badge.target); return { ...badge, value, unlocked:value >= badge.target }; });
   }
-  function personalBadges(list, person, restDays = new Set()) {
+  // `extra` carries stats that don't come from workouts (gomoku wins), keeping this module free of other data sources.
+  function personalBadges(list, person, restDays = new Set(), extra = {}) {
     const own = list.filter((entry) => entry.person === person);
-    const stats = { sessions:own.length, calories:Q.totals(own)[person], longestStreak:streaks(personDays(list, person), new Date(), restDays).longest };
+    const stats = { ...extra, sessions:own.length, calories:Q.totals(own)[person], longestStreak:streaks(personDays(list, person), new Date(), restDays).longest };
     own.forEach((entry) => { stats[`activity:${entry.activity}`] = (stats[`activity:${entry.activity}`] || 0) + 1; });
     stats.activityKinds = Object.keys(Q.CALORIE_RATES).filter((activity) => stats[`activity:${activity}`]).length;
     return progress(PERSONAL_BADGES, stats);
   }
-  function coupleBadges(list, today) {
+  function coupleBadges(list, today, extra = {}) {
     const together = togetherDays(list);
-    return progress(COUPLE_BADGES, { togetherDays:together.size, togetherStreak:streaks(together, today).longest, bossWins:bossWins(list, today) });
+    return progress(COUPLE_BADGES, { ...extra, togetherDays:together.size, togetherStreak:streaks(together, today).longest, bossWins:bossWins(list, today) });
   }
 
   const api = { HEAT_STEPS, heatLevel, dailyCalories, heatmapDays, personDays, togetherDays, streaks, countInMonth, levelTitle, BOSS_HP, weeklyBoss, bossWins, personalBadges, coupleBadges };
