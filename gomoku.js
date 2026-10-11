@@ -38,6 +38,14 @@
     return null;
   }
 
+  // Undo needs no consent: you may take back only your own last move, and only before the opponent replies.
+  function canUndo(game, moves, person) {
+    if (!game || game.status !== 'playing') return '这一局已经结束了';
+    if (!moves.length) return '还没有可以悔的棋';
+    if (moves[moves.length - 1].person !== person) return '只能在对方落子前，悔自己刚下的那一步';
+    return null;
+  }
+
   function record(games) {
     const result = { Carol:0, Allen:0, draws:0, finished:0 };
     games.filter((game) => game.status === 'finished').forEach((game) => {
@@ -54,6 +62,6 @@
     return latest.black === 'Carol' ? 'Allen' : 'Carol';
   }
 
-  const api = { SIZE, board, nextTurn, winningLine, canPlay, record, nextBlack };
+  const api = { SIZE, board, nextTurn, winningLine, canPlay, canUndo, record, nextBlack };
   if (typeof module === 'object' && module.exports) module.exports = api; else root.QQLLGomoku = api;
 })(this);
