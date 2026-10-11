@@ -360,7 +360,7 @@ function renderBattle() {
   const status = $('#gomokuStatus');
   status.classList.toggle('is-mine', myTurn);
   if (!game) status.textContent = '还没有对局，开一局吧';
-  else if (game.status === 'playing') status.textContent = `第 ${boardMoves.length + 1} 手 · ${myTurn ? (pendingCell ? '再点一次或按「落子」确认' : '轮到你了') : `等 ${turn} 落子`}`;
+  else if (game.status === 'playing') status.textContent = `第 ${boardMoves.length + 1} 手 · ${myTurn ? (pendingCell ? '按「落子」确认，或点别处换位置' : '轮到你了') : `等 ${turn} 落子`}`;
   else if (!game.winner) status.textContent = `平局 · 下满了 ${game.move_count} 手`;
   else status.textContent = `${game.winner} 赢了这局 · 共 ${game.move_count} 手${win ? '' : `（${game.winner === game.black ? game.white : game.black} 认输）`}`;
 
@@ -382,7 +382,8 @@ function renderBattle() {
   $('#gomokuBoard').innerHTML = html;
   $('#gomokuPlace').hidden = !(myTurn && pendingCell);
   $('#gomokuNew').hidden = !(game?.status !== 'playing' && me);
-  $('#gomokuResign').hidden = !(game?.status === 'playing' && me && (game.black === me.person || game.white === me.person));
+  $('#gomokuSecondary').hidden = !(game?.status === 'playing' && me && (game.black === me.person || game.white === me.person));
+  $('#gomokuUndo').classList.toggle('is-muted', !!K.canUndo(game, boardMoves, me?.person));
 
   const rec = K.record(games);
   const format = new Intl.DateTimeFormat('zh-CN', { month:'numeric', day:'numeric' });
@@ -405,8 +406,19 @@ function tapCell(x, y) {
   if (!me || game?.status !== 'playing') return;
   if (K.nextTurn(game, boardMoves) !== me.person) { showToast(`还没轮到你，等 ${K.nextTurn(game, boardMoves)} 落子`, { key:'gomoku' }); return; }
   if (K.board(boardMoves).has(`${x},${y}`)) return;
-  if (pendingCell && pendingCell.x === x && pendingCell.y === y) { placeStone(x, y); return; }
+  // Tapping only (re)selects; a stone is placed solely by the 落子 button, so a double tap can't misplace one.
   pendingCell = { x, y }; renderBattle();
+}
+async function undoMove() {
+  const game = shownGame();
+  const problem = K.canUndo(game, boardMoves, me?.person);
+  if (problem) { showToast(problem, { key:'gomoku' }); return; }
+  pendingCell = null;
+  boardMoves = boardMoves.slice(0, -1);   // optimistic; the reload confirms
+  renderBattle();
+  const { error } = await supabaseClient.rpc('gomoku_undo', { p_game:game.id });
+  showToast(error ? `悔棋失败：${errorText(error)}` : '已悔棋，轮到你重新下', { key:'gomoku' });
+  await loadRemoteRecords().catch((reloadError) => console.error(reloadError));
 }
 async function startGame() {
   // black / white are decided by the gomoku_games_before_insert trigger; these placeholders only satisfy NOT NULL.
@@ -674,6 +686,7 @@ function bindUi() {
   $('#gomokuPlace').addEventListener('click', () => { if (pendingCell) placeStone(pendingCell.x, pendingCell.y); });
   $('#gomokuNew').addEventListener('click', startGame);
   $('#gomokuResign').addEventListener('click', resignGame);
+  $('#gomokuUndo').addEventListener('click', undoMove);
   $('#periodForm').addEventListener('submit', savePeriodRange);
   $('#periodUnmark').addEventListener('click', clearPeriodRange);
   $('#closePeriod').addEventListener('click', () => $('#periodDialog').close());

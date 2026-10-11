@@ -48,6 +48,16 @@ test('move validation mirrors the database rules', () => {
   assert.match(K.canPlay({ ...game, status:'finished' }, moves, 'Allen', 0, 0), /已经结束/);
 });
 
+test('undo: only your own last move, before the opponent replies, while the game is on', () => {
+  const game = { black:'Carol', white:'Allen', status:'playing' };
+  assert.equal(K.canUndo(game, play([[7, 7]]), 'Carol'), null);
+  assert.match(K.canUndo(game, play([[7, 7]]), 'Allen'), /对方落子前/);
+  assert.match(K.canUndo(game, play([[7, 7], [7, 8]]), 'Carol'), /对方落子前/);
+  assert.equal(K.canUndo(game, play([[7, 7], [7, 8]]), 'Allen'), null);
+  assert.match(K.canUndo(game, [], 'Carol'), /还没有/);
+  assert.match(K.canUndo({ ...game, status:'finished' }, play([[7, 7]]), 'Carol'), /已经结束/);
+});
+
 test('record counts wins per person and draws over finished games only', () => {
   const games = [
     { status:'finished', winner:'Carol' }, { status:'finished', winner:'Carol' }, { status:'finished', winner:'Allen' },
