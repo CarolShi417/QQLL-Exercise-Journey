@@ -9,6 +9,7 @@ const $ = (selector) => document.querySelector(selector);
 const Q = window.QQLL;
 const G = window.QQLLGame;
 const Cy = window.QQLLCycle;
+const K = window.QQLLGomoku;
 // Only Carol tracks a period; the data model allows either person, the UI shows it for her.
 const CYCLE_PERSON = 'Carol';
 
@@ -24,6 +25,11 @@ let badgeOwner = null;
 let freshPixel = null;
 let periodDays = [];          // [{ person, date }]
 let periodsAvailable = false; // false until the period_days migration has been run
+let games = [];               // newest first
+let boardMoves = [];          // moves of the game on the board (the active one, else the latest)
+let gomokuAvailable = false;  // false until the gomoku migration has been run
+let pendingCell = null;       // { x, y } picked but not yet confirmed
+let announcedGame = null;     // id of the last finished game we already announced
 
 function number(value) { return new Intl.NumberFormat('zh-CN').format(value); }
 function icon(name) { return `<svg class="icon" aria-hidden="true"><use href="#i-${name}"/></svg>`; }
@@ -97,6 +103,7 @@ function hideAuthScreen() { $('#authScreen').classList.add('is-hidden'); }
 function showView(name) {
   document.querySelectorAll('.nav-item').forEach((item) => item.classList.toggle('is-active', item.dataset.view === name));
   document.querySelectorAll('.view').forEach((view) => view.classList.toggle('is-active', view.id === name));
+  if (typeof renderBattle === 'function') renderBattle();
 }
 
 // ---------- period ----------
@@ -323,14 +330,109 @@ function renderAchievements() {
   host.querySelectorAll('[data-share]').forEach((bar) => { bar.style.width = `${bar.dataset.share}%`; });
   const owner = badgeOwner || 'couple';
   document.querySelectorAll('[data-badge-owner]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.badgeOwner === owner)));
-  const badges = owner === 'couple' ? G.coupleBadges(entries, new Date()) : G.personalBadges(entries, owner, restDays(owner));
+  const rec = K.record(games);
+  const badges = owner === 'couple' ? G.coupleBadges(entries, new Date(), { gomokuGames:rec.finished }) : G.personalBadges(entries, owner, restDays(owner), { gomokuWins:rec[owner] });
   const scope = owner === 'couple' ? 'is-both' : `is-${owner.toLowerCase()}`;
   $('#badgeGrid').innerHTML = badges.map((badge) => badgeHtml(badge, scope)).join('');
   $('#accountInfo').textContent = me ? `当前账号：${me.person}` : '';
 }
 function render() {
   document.querySelectorAll('.period-legend').forEach((item) => { item.hidden = !periodsAvailable; });
-  renderHome(); renderCalendar(); renderDayRecords(); renderAchievements();
+  renderHome(); renderCalendar(); renderDayRecords(); renderAchievements(); renderBattle();
+}
+
+// ---------- gomoku ----------
+function shownGame() { return games.find((game) => game.status === 'playing') || games[0] || null; }
+function gomokuPlayerHtml(person, game, turn) {
+  const role = game ? (game.black === person ? '先手' : '后手') : '';
+  return `<div class="gomoku-player is-${person.toLowerCase()}${turn === person ? ' is-turn' : ''}"><span class="habit-tile">${Q.catHtml(person)}</span><span>${person}<small>${role}${me?.person === person ? ' · 你' : ''}</small></span><i class="stone-swatch"></i></div>`;
+}
+function renderBattle() {
+  $('#battleTab').hidden = !gomokuAvailable;
+  const game = shownGame();
+  const turn = K.nextTurn(game, boardMoves);
+  const myTurn = !!me && turn === me.person;
+  $('#battleDot').hidden = !(myTurn && !$('#battle').classList.contains('is-active'));
+  if (!gomokuAvailable) return;
+
+  $('#gomokuPlayers').innerHTML = Q.PEOPLE.map((person) => gomokuPlayerHtml(person, game, turn)).join('');
+  const win = game?.status === 'finished' ? K.winningLine(boardMoves) : null;
+  const status = $('#gomokuStatus');
+  status.classList.toggle('is-mine', myTurn);
+  if (!game) status.textContent = '还没有对局，开一局吧';
+  else if (game.status === 'playing') status.textContent = `第 ${boardMoves.length + 1} 手 · ${myTurn ? (pendingCell ? '再点一次或按「落子」确认' : '轮到你了') : `等 ${turn} 落子`}`;
+  else if (!game.winner) status.textContent = `平局 · 下满了 ${game.move_count} 手`;
+  else status.textContent = `${game.winner} 赢了这局 · 共 ${game.move_count} 手${win ? '' : `（${game.winner === game.black ? game.white : game.black} 认输）`}`;
+
+  const stones = K.board(boardMoves);
+  const last = boardMoves[boardMoves.length - 1];
+  const winning = new Set((win?.cells || []).map(([x, y]) => `${x},${y}`));
+  const stars = new Set(['3,3', '3,11', '11,3', '11,11', '7,7']);
+  let html = '';
+  for (let y = 0; y < K.SIZE; y += 1) {
+    for (let x = 0; x < K.SIZE; x += 1) {
+      const key = `${x},${y}`;
+      const owner = stones.get(key);
+      const pending = !owner && pendingCell && pendingCell.x === x && pendingCell.y === y;
+      const classes = ['gomoku-cell', x === 0 ? 'edge-l' : '', x === K.SIZE - 1 ? 'edge-r' : '', y === 0 ? 'edge-t' : '', y === K.SIZE - 1 ? 'edge-b' : '', stars.has(key) ? 'is-star' : '', last && last.x === x && last.y === y ? 'is-last' : '', winning.has(key) ? 'is-win' : ''].filter(Boolean).join(' ');
+      const stone = owner ? `<i class="stone is-${owner.toLowerCase()}"></i>` : pending ? `<i class="stone is-pending is-${me.person.toLowerCase()}"></i>` : '';
+      html += `<button class="${classes}" type="button" data-x="${x}" data-y="${y}" aria-label="${x + 1} 列 ${y + 1} 行${owner ? `，${owner} 的子` : ''}">${stone}</button>`;
+    }
+  }
+  $('#gomokuBoard').innerHTML = html;
+  $('#gomokuPlace').hidden = !(myTurn && pendingCell);
+  $('#gomokuNew').hidden = !(game?.status !== 'playing' && me);
+  $('#gomokuResign').hidden = !(game?.status === 'playing' && me && (game.black === me.person || game.white === me.person));
+
+  const rec = K.record(games);
+  const format = new Intl.DateTimeFormat('zh-CN', { month:'numeric', day:'numeric' });
+  const history = games.filter((item) => item.status === 'finished').slice(0, 5).map((item) => `<li><span>${format.format(new Date(item.finished_at || item.created_at))}</span><span>${item.winner ? `${item.winner} 胜` : '平局'} · ${item.move_count} 手</span></li>`).join('');
+  $('#gomokuRecord').innerHTML = `<h3>战绩</h3><div class="gomoku-score"><div class="is-carol"><b>${rec.Carol}</b><span>Carol 胜</span></div><div class="is-both"><b>${rec.draws}</b><span>平局</span></div><div class="is-allen"><b>${rec.Allen}</b><span>Allen 胜</span></div></div>${history ? `<ul class="gomoku-history">${history}</ul>` : ''}`;
+}
+async function placeStone(x, y) {
+  const game = shownGame();
+  const problem = K.canPlay(game, boardMoves, me?.person, x, y);
+  if (problem) { showToast(problem, { key:'gomoku' }); return; }
+  pendingCell = null;
+  boardMoves = [...boardMoves, { moveNo:boardMoves.length + 1, person:me.person, x, y }];   // optimistic; the reload confirms
+  renderBattle();
+  const { error } = await supabaseClient.from('gomoku_moves').insert({ game_id:game.id, x, y });
+  if (error) showToast(`落子失败：${errorText(error)}`, { key:'gomoku' });
+  await loadRemoteRecords().catch((reloadError) => console.error(reloadError));
+}
+function tapCell(x, y) {
+  const game = shownGame();
+  if (!me || game?.status !== 'playing') return;
+  if (K.nextTurn(game, boardMoves) !== me.person) { showToast(`还没轮到你，等 ${K.nextTurn(game, boardMoves)} 落子`, { key:'gomoku' }); return; }
+  if (K.board(boardMoves).has(`${x},${y}`)) return;
+  if (pendingCell && pendingCell.x === x && pendingCell.y === y) { placeStone(x, y); return; }
+  pendingCell = { x, y }; renderBattle();
+}
+async function startGame() {
+  // black / white are decided by the gomoku_games_before_insert trigger; these placeholders only satisfy NOT NULL.
+  const { error } = await supabaseClient.from('gomoku_games').insert({ black:'Carol', white:'Allen' });
+  if (error) { showToast(`开局失败：${errorText(error)}`, { key:'gomoku' }); return; }
+  pendingCell = null; await loadRemoteRecords().catch((reloadError) => console.error(reloadError));
+  const game = shownGame();
+  if (game) showToast(`新的一局，${game.black} 先手`, { key:'gomoku' });
+}
+async function resignGame() {
+  const game = shownGame();
+  if (!game || game.status !== 'playing' || !confirm('认输这一局？')) return;
+  const { error } = await supabaseClient.rpc('gomoku_resign', { p_game:game.id });
+  if (error) { showToast(`认输失败：${errorText(error)}`, { key:'gomoku' }); return; }
+  await loadRemoteRecords().catch((reloadError) => console.error(reloadError));
+}
+// When the game on the board has just finished (by either phone), say who won — once per game.
+function announceResult(previous) {
+  const game = shownGame();
+  if (!me || !game || game.status !== 'finished' || announcedGame === game.id) return;
+  const justFinished = previous && previous.id === game.id && previous.status === 'playing';
+  announcedGame = game.id;
+  if (!justFinished) return;
+  if (!game.winner) showToast('这局下成了平局', { key:'gomoku' });
+  else if (game.winner === me.person) showToast('你赢了这局五子棋', { celebrate:true });
+  else showToast(`${game.winner} 赢了这局`, { key:'gomoku' });
 }
 
 // ---------- celebrations ----------
@@ -340,7 +442,7 @@ function progressSnapshot() {
   const unlocked = (list) => new Set(list.filter((badge) => badge.unlocked).map((badge) => badge.name));
   return {
     levels:Object.fromEntries(Q.PEOPLE.map((person) => [person, Q.currentLevel(Q.experience(Q.totals(entries)[person])).level])),
-    badges:Object.fromEntries([['一起', unlocked(G.coupleBadges(entries, today))], ...Q.PEOPLE.map((person) => [person, unlocked(G.personalBadges(entries, person, restDays(person)))])]),
+    badges:Object.fromEntries([['一起', unlocked(G.coupleBadges(entries, today, { gomokuGames:K.record(games).finished }))], ...Q.PEOPLE.map((person) => [person, unlocked(G.personalBadges(entries, person, restDays(person), { gomokuWins:K.record(games)[person] }))])]),
     boss:G.weeklyBoss(entries, today),
   };
 }
@@ -381,11 +483,26 @@ async function fetchPeriodDays() {
   if (error) { console.warn('period tracking unavailable:', error.message); return null; }
   return data.map((row) => ({ person:row.person, date:row.period_date }));
 }
+// Gomoku is optional in the same way: before its migration runs the battle tab stays hidden.
+async function fetchGomoku() {
+  const { data:list, error } = await supabaseClient.from('gomoku_games').select('id,black,white,status,winner,move_count,created_at,finished_at').order('id', { ascending:false }).limit(50);
+  if (error) { console.warn('gomoku unavailable:', error.message); return null; }
+  const shown = list.find((game) => game.status === 'playing') || list[0];
+  if (!shown) return { games:list, moves:[] };
+  const { data:moves, error:movesError } = await supabaseClient.from('gomoku_moves').select('move_no,person,x,y').eq('game_id', shown.id).order('move_no');
+  if (movesError) { console.warn('gomoku moves unavailable:', movesError.message); return null; }
+  return { games:list, moves:moves.map((move) => ({ moveNo:move.move_no, person:move.person, x:move.x, y:move.y })) };
+}
 async function loadRemoteRecords() {
   const current = session;
-  const [rows, periods] = await Promise.all([fetchAllRows(), fetchPeriodDays()]);
+  const [rows, periods, gomoku] = await Promise.all([fetchAllRows(), fetchPeriodDays(), fetchGomoku()]);
   if (current !== session) return;
-  entries = rows.map(appEntry); periodDays = periods || []; periodsAvailable = periods !== null; render();
+  entries = rows.map(appEntry); periodDays = periods || []; periodsAvailable = periods !== null;
+  const previous = shownGame();
+  games = gomoku?.games || []; boardMoves = gomoku?.moves || []; gomokuAvailable = gomoku !== null;
+  if (pendingCell && (shownGame()?.status !== 'playing' || K.board(boardMoves).has(`${pendingCell.x},${pendingCell.y}`))) pendingCell = null;
+  announceResult(previous);
+  render();
 }
 function scheduleReload() { clearTimeout(reloadTimer); reloadTimer = setTimeout(() => { if (me) loadRemoteRecords().catch((error) => console.error(error)); }, 300); }
 async function addWorkout(entry) {
@@ -425,6 +542,8 @@ function subscribeToChanges() {
   realtimeChannel = supabaseClient.channel('workouts-live-sync')
     .on('postgres_changes', { event:'*', schema:'public', table:'workouts' }, scheduleReload)
     .on('postgres_changes', { event:'*', schema:'public', table:'period_days' }, scheduleReload)
+    .on('postgres_changes', { event:'*', schema:'public', table:'gomoku_games' }, scheduleReload)
+    .on('postgres_changes', { event:'*', schema:'public', table:'gomoku_moves' }, scheduleReload)
     .subscribe();
 }
 async function startAuthenticatedApp(user) {
@@ -446,7 +565,7 @@ async function startAuthenticatedApp(user) {
   }
 }
 function stopApp() {
-  session += 1; me = null; entries = []; periodDays = []; periodsAvailable = false; selectedDate = null; badgeOwner = null; freshPixel = null; clearTimeout(reloadTimer);
+  session += 1; me = null; entries = []; periodDays = []; periodsAvailable = false; games = []; boardMoves = []; gomokuAvailable = false; pendingCell = null; announcedGame = null; selectedDate = null; badgeOwner = null; freshPixel = null; clearTimeout(reloadTimer);
   if (realtimeChannel) { supabaseClient.removeChannel(realtimeChannel); realtimeChannel = null; }
   if ($('#checkinDialog').open) $('#checkinDialog').close();
   if ($('#periodDialog').open) $('#periodDialog').close();
@@ -551,6 +670,10 @@ function bindUi() {
     const remove = event.target.closest('[data-delete]'); if (remove) deleteRecord(remove.dataset.delete);
   });
   document.querySelectorAll('[data-badge-owner]').forEach((button) => button.addEventListener('click', () => { badgeOwner = button.dataset.badgeOwner; renderAchievements(); }));
+  $('#gomokuBoard').addEventListener('click', (event) => { const cell = event.target.closest('[data-x]'); if (cell) tapCell(Number(cell.dataset.x), Number(cell.dataset.y)); });
+  $('#gomokuPlace').addEventListener('click', () => { if (pendingCell) placeStone(pendingCell.x, pendingCell.y); });
+  $('#gomokuNew').addEventListener('click', startGame);
+  $('#gomokuResign').addEventListener('click', resignGame);
   $('#periodForm').addEventListener('submit', savePeriodRange);
   $('#periodUnmark').addEventListener('click', clearPeriodRange);
   $('#closePeriod').addEventListener('click', () => $('#periodDialog').close());

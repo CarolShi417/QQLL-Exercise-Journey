@@ -80,6 +80,15 @@ test('personal streak badges honour rest days', () => {
   assert.equal(without.streak7.unlocked, false);
 });
 
+test('gomoku badges come from the game record, not from workouts', () => {
+  const personal = Object.fromEntries(G.personalBadges([], 'Carol', new Set(), { gomokuWins:3 }).map((badge) => [badge.id, badge]));
+  assert.equal(personal.gomoku1.unlocked, true);
+  assert.deepEqual([personal.gomoku10.value, personal.gomoku10.unlocked], [3, false]);
+  assert.equal(Object.fromEntries(G.personalBadges([], 'Carol').map((badge) => [badge.id, badge])).gomoku1.unlocked, false);
+  const couple = Object.fromEntries(G.coupleBadges([], new Date(2026, 9, 11), { gomokuGames:10 }).map((badge) => [badge.id, badge]));
+  assert.equal(couple.gomokuGames10.unlocked, true);
+});
+
 test('person days and together days', () => {
   const list = [entry('Carol', '2026-10-05'), entry('Carol', '2026-10-05'), entry('Allen', '2026-10-05'), entry('Carol', '2026-10-06'), entry('Allen', '2026-10-07')];
   assert.deepEqual([...G.personDays(list, 'Carol')].sort(), ['2026-10-05', '2026-10-06']);
