@@ -152,7 +152,7 @@ begin
   if not found then raise exception '没有可以认输的棋局'; end if;
 end $$;
 
-revoke execute on function public.gomoku_games_before_insert(), public.gomoku_moves_before_insert(), public.gomoku_moves_after_insert() from public, anon;
+revoke execute on function public.gomoku_games_before_insert(), public.gomoku_moves_before_insert(), public.gomoku_moves_after_insert() from public, anon, authenticated;
 revoke execute on function public.gomoku_resign(bigint) from public, anon;
 grant execute on function public.gomoku_resign(bigint) to authenticated;
 
