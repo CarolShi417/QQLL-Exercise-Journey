@@ -24,7 +24,7 @@ npm run build:assets
 - supabase-js 锁定版本并带 SRI。升级时从 `https://data.jsdelivr.com/v1/packages/npm/@supabase/supabase-js@<版本>?structure=flat` 取 `/dist/umd/supabase.js` 的 hash，填成 `sha256-<hash>`。
 - 迁移 SQL 由人手动粘贴到 SQL Editor 运行，没有 CLI 关联；新增迁移要写成可重复运行的形式。重新运行 `20261008000000_secure_workouts.sql` 会删掉 `workouts` 上全部策略，之后必须按文件名顺序把后面的迁移全部再跑一遍（否则自动备份静默变空、插入策略放宽；"只能给自己打卡"由独立触发器保证，不受影响）。
 - 备份格式只有一种：App 导出、`backup/export.sql`（每日自动备份，跑在私有仓库里）、`backup.js`（导入校验）三处共用 `{ exported_at, workouts: [{ person, activity, minutes, calories, date }], periods: [{ person, date }] }`（`periods` 可缺省，兼容旧备份）。改字段要三处一起改，并同步私有仓库 sum-tree/qqll-backup 里的 `export.sql`——**必须先在 Supabase 跑完对应迁移再更新它**，否则每日备份会因为表不存在而失败。`backup/` 只是模板，备份数据绝不能进这个公开仓库。
-- 经期（`period_days` + `cycle.js`）：敏感健康数据。界面只给 `CYCLE_PERSON`（Carol）显示标记入口，始终共享给对方是用户的决定；预测只按日历推算，界面必须保留"仅供参考，不能用于避孕"。经期里没运动的日子作为 `restDays` 传给 `G.streaks`，桥接连续天数但不计入。前端在表不存在时（迁移没跑）静默隐藏经期功能，不影响打卡。
+- 经期（`period_days` + `cycle.js`）：敏感健康数据。界面只给 `CYCLE_PERSON`（Carol）显示标记入口，始终共享给对方是用户的决定。**只记录、不预测**也是用户的决定：不要加回下次经期推算、周期平均值或排卵相关内容。经期里没运动的日子作为 `restDays` 传给 `G.streaks`，桥接连续天数但不计入。前端在表不存在时（迁移没跑）静默隐藏经期功能，不影响打卡。
 - 在 `onAuthStateChange` 回调里不要直接 await Supabase 调用（会锁死 auth），用 `setTimeout` 推迟。
 - 等级、连续天数、徽章、每周 Boss 都由 `game.js` 从打卡记录推算，不存数据库。加新玩法时保持这个做法：数据库只存服务器校验过的打卡，前端就没有可以篡改的分数。
 - 像素字体：字号只用 12 / 16 / 24px，其他尺寸在手机上会糊；没有粗体，强调靠颜色和字号。裁剪版字体只含源码里出现过的字，漏跑 `build:assets` 时缺的字会去下载 652KB 的完整字体，不会显示成方块，但会变慢。

@@ -107,31 +107,27 @@ function periodDayNumber(person, key) {
   const period = Cy.periodsFromDays(periodKeys(person)).find((item) => key >= item.start && key <= item.end);
   return period && periodKeys(person).includes(key) ? Math.round((new Date(`${key}T00:00:00`) - new Date(`${period.start}T00:00:00`)) / 864e5) + 1 : 0;
 }
-function periodClass(person, key, cycle) {
-  if (!periodsAvailable || person !== CYCLE_PERSON) return '';
-  if (periodKeys(person).includes(key)) return 'is-period';
-  return cycle.predicted.has(key) ? 'is-predicted' : '';
+function periodClass(person, key) {
+  return periodsAvailable && person === CYCLE_PERSON && periodKeys(person).includes(key) ? 'is-period' : '';
 }
 function shortDate(key) { return new Intl.DateTimeFormat('zh-CN', { month:'numeric', day:'numeric' }).format(new Date(`${key}T00:00:00`)); }
 function cycleCardHtml(cycle) {
   const todayKey = Q.dateKey(new Date());
   const mine = me?.person === CYCLE_PERSON;
+  // Recording only: what has been marked, never a prediction.
   const status = {
     none:'还没有记录',
     in:`经期第 ${cycle.dayOfPeriod} 天`,
-    upcoming:cycle.daysUntil === 0 ? '预计今天开始' : `距下次经期约 ${cycle.daysUntil} 天（${cycle.nextStart ? shortDate(cycle.nextStart) : ''}）`,
-    late:`比预计晚了 ${cycle.daysLate} 天`,
+    after:cycle.last ? `上次经期 ${shortDate(cycle.last.start)}${cycle.last.length > 1 ? `–${shortDate(cycle.last.end)}` : ''}，共 ${cycle.last.length} 天` : '',
   }[cycle.status];
-  const basis = cycle.cyclesUsed ? `平均周期 ${cycle.avgCycle} 天 · 经期 ${cycle.avgLength} 天 · 基于 ${cycle.cyclesUsed} 次记录` : `记录还不够，暂按 ${cycle.avgCycle} 天周期、${cycle.avgLength} 天经期估算`;
   const marked = periodKeys(CYCLE_PERSON).includes(todayKey);
   const action = mine
     ? `<button class="${marked ? 'link-button' : 'primary-button is-period'}" type="button" data-period-toggle="${todayKey}">${marked ? '今天不是经期' : '今天是经期'}</button>`
     : `<p class="cycle-note">由 ${CYCLE_PERSON} 记录</p>`;
   return `<article class="habit-card cycle-card">
     <header class="habit-head"><span class="habit-tile cycle-tile">${icon('paw')}</span><div class="habit-title"><strong>${CYCLE_PERSON} 的经期</strong><span>${status}</span></div></header>
-    <p class="cycle-basis">${basis}</p>
     ${action}
-    <p class="cycle-note">${mine ? '也可以在日历里补记或取消任意一天。' : ''}预测只按日历推算，仅供参考，不能用于避孕。</p>
+    ${mine ? '<p class="cycle-note">也可以在日历里补记或取消任意一天。</p>' : ''}
   </article>`;
 }
 async function togglePeriodDay(key) {
@@ -203,8 +199,8 @@ function renderHome() {
       gridLabel:`${person} 最近 ${HEATMAP_WEEKS} 周的运动热力图，共 ${activeDays.size} 天有运动`,
       pixels:days.map((day) => {
         const calories = daily.get(day.key)?.[person] || 0;
-        const extra = periodClass(person, day.key, cycle);
-        const note = extra === 'is-period' ? ' · 经期' : extra === 'is-predicted' ? ' · 预计经期' : '';
+        const extra = periodClass(person, day.key);
+        const note = extra ? ' · 经期' : '';
         return pixelHtml(day, G.heatLevel(calories), `${day.key} · ${number(calories)} kcal${note}`, extra);
       }).join(''),
       streak:G.streaks(activeDays, today, restDays(person)), streakLabel:'连续',
@@ -227,7 +223,6 @@ function renderCalendar() {
   const firstCell = new Date(year, month, 1 - (new Date(year, month, 1).getDay() + 6) % 7);
   const todayKey = Q.dateKey(new Date());
   const daily = G.dailyCalories(entries);
-  const cycle = cycleFor(CYCLE_PERSON);
   $('#calendarMonth').textContent = new Intl.DateTimeFormat('zh-CN', { year:'numeric', month:'long' }).format(displayedMonth);
   let html = '';
   for (let i = 0; i < 42; i += 1) {
@@ -235,7 +230,7 @@ function renderCalendar() {
     const key = Q.dateKey(date);
     const totals = daily.get(key) || { Carol:0, Allen:0 };
     const classes = ['day', date.getMonth() === month ? '' : 'other-month', key === todayKey ? 'is-today' : '', selectedDate === key ? 'is-selected' : ''].filter(Boolean).join(' ');
-    const minis = Q.PEOPLE.map((person) => `<i class="mini is-${person.toLowerCase()} l${G.heatLevel(totals[person])} ${periodClass(person, key, cycle)}"></i>`).join('');
+    const minis = Q.PEOPLE.map((person) => `<i class="mini is-${person.toLowerCase()} l${G.heatLevel(totals[person])} ${periodClass(person, key)}"></i>`).join('');
     html += `<button class="${classes}" data-date="${key}" type="button" aria-label="${key}"><span class="day-number">${date.getDate()}</span><span class="day-pixels">${minis}</span></button>`;
   }
   $('#calendar').innerHTML = html;
@@ -252,8 +247,7 @@ function renderDayRecords() {
 function periodRowHtml(key) {
   if (!periodsAvailable) return '';
   const dayNumber = periodDayNumber(CYCLE_PERSON, key);
-  const predicted = !dayNumber && cycleFor(CYCLE_PERSON).predicted.has(key);
-  const text = dayNumber ? `${CYCLE_PERSON} 经期第 ${dayNumber} 天` : predicted ? `${CYCLE_PERSON} 预计经期` : '';
+  const text = dayNumber ? `${CYCLE_PERSON} 经期第 ${dayNumber} 天` : '';
   const canToggle = me?.person === CYCLE_PERSON && key <= Q.dateKey(new Date());
   if (!text && !canToggle) return '';
   const toggle = canToggle ? `<button class="link-button" type="button" data-period-toggle="${key}">${dayNumber ? '取消经期标记' : '标记为经期'}</button>` : '';
