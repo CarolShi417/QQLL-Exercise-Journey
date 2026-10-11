@@ -29,11 +29,18 @@
   function togetherDays(list) { const carol = personDays(list, 'Carol'); return new Set([...personDays(list, 'Allen')].filter((key) => carol.has(key))); }
 
   // A streak stays alive through today until the day is over, so it counts back from yesterday when today has no record yet.
-  function streaks(days, today) {
+  // restDays (period days) bridge a streak without counting as workouts.
+  function streaks(days, today, restDays = new Set()) {
     let cursor = addDays(today, 0); if (!days.has(Q.dateKey(cursor))) cursor = addDays(cursor, -1);
-    let current = 0; while (days.has(Q.dateKey(cursor))) { current += 1; cursor = addDays(cursor, -1); }
+    let current = 0;
+    for (;;) {
+      const key = Q.dateKey(cursor);
+      if (days.has(key)) current += 1; else if (!restDays.has(key)) break;
+      cursor = addDays(cursor, -1);
+    }
     let longest = 0; let run = 0; let previous = null;
-    [...days].sort().forEach((key) => { const date = new Date(`${key}T00:00:00`); run = previous && Q.dateKey(addDays(previous, 1)) === key ? run + 1 : 1; longest = Math.max(longest, run); previous = date; });
+    const bridged = (from, to) => { for (let d = addDays(from, 1); Q.dateKey(d) < to; d = addDays(d, 1)) if (!restDays.has(Q.dateKey(d))) return false; return true; };
+    [...days].sort().forEach((key) => { const date = new Date(`${key}T00:00:00`); run = previous && bridged(previous, key) ? run + 1 : 1; longest = Math.max(longest, run); previous = date; });
     return { current, longest };
   }
 
@@ -90,9 +97,9 @@
   function progress(definitions, stats) {
     return definitions.map((badge) => { const value = Math.min(stats[badge.metric] || 0, badge.target); return { ...badge, value, unlocked:value >= badge.target }; });
   }
-  function personalBadges(list, person) {
+  function personalBadges(list, person, restDays = new Set()) {
     const own = list.filter((entry) => entry.person === person);
-    const stats = { sessions:own.length, calories:Q.totals(own)[person], longestStreak:streaks(personDays(list, person), new Date()).longest };
+    const stats = { sessions:own.length, calories:Q.totals(own)[person], longestStreak:streaks(personDays(list, person), new Date(), restDays).longest };
     own.forEach((entry) => { stats[`activity:${entry.activity}`] = (stats[`activity:${entry.activity}`] || 0) + 1; });
     stats.activityKinds = Object.keys(Q.CALORIE_RATES).filter((activity) => stats[`activity:${activity}`]).length;
     return progress(PERSONAL_BADGES, stats);

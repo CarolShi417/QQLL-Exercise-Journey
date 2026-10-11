@@ -105,7 +105,7 @@
           <div class="weekdays"><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span><span>日</span></div>
           <div class="calendar" id="calendar"></div>
         </div>
-        <div class="legend"><span><i class="dot is-carol"></i>Carol</span><span><i class="dot is-allen"></i>Allen</span><span><svg class="icon"><use href="#i-paw"/></svg>颜色越深运动越多</span></div>
+        <div class="legend"><span><i class="dot is-carol"></i>Carol</span><span><i class="dot is-allen"></i>Allen</span><span class="period-legend" hidden><i class="dot is-period"></i>经期</span><span><svg class="icon"><use href="#i-paw"/></svg>颜色越深运动越多</span></div>
         <div class="day-records" id="dayRecords"><p>点按日期，查看当天记录</p></div>
       </section>
 
@@ -114,9 +114,9 @@
         <div class="section-head">
           <h2>徽章</h2>
           <div class="segmented" role="group" aria-label="查看谁的徽章">
+            <button type="button" data-badge-owner="couple">一起</button>
             <button type="button" data-badge-owner="Carol">Carol</button>
             <button type="button" data-badge-owner="Allen">Allen</button>
-            <button type="button" data-badge-owner="couple">一起</button>
           </div>
         </div>
         <div class="badge-grid" id="badgeGrid"></div>
@@ -152,6 +152,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js" integrity="sha256-hO6b9FaVwd07oVlba8+w8JZyQ0YxNR/8jr6RQFRdX/Y=" crossorigin="anonymous"></script>
     <script src="logic.js"></script>
     <script src="game.js"></script>
+    <script src="cycle.js"></script>
     <script src="backup.js"></script>
     <script src="app.js"></script>
   </body>
