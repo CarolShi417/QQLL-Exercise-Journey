@@ -27,6 +27,7 @@ npm run build:assets
 - 经期（`period_days` + `cycle.js`）：敏感健康数据。界面只给 `CYCLE_PERSON`（Carol）显示标记入口，始终共享给对方是用户的决定。**只记录、不预测**也是用户的决定：不要加回下次经期推算、周期平均值或排卵相关内容。显示上只把格子底色变淡粉（热力图的爪印外包一层 `.px-box`，日历是 `.day.is-period-day`），爪印本身保持原色；标记按日期范围整段写入（`Cy.rangeDays`，一次最多 15 天）。经期里没运动的日子作为 `restDays` 传给 `G.streaks`，桥接连续天数但不计入。前端在表不存在时（迁移没跑）静默隐藏经期功能，不影响打卡。
 - 五子棋（`gomoku_games` / `gomoku_moves` + `gomoku.js`）：数据库是唯一权威，`gomoku.js` 只是给界面镜像同一套规则（改规则两边一起改）。棋局不进备份。同 `period_days` 一样，表不存在时前端隐藏「对战」标签。
 - 写 `security definer` 触发器时**不要**用 `current_user not in ('authenticated', 'anon')` 做管理员放行：definer 函数里 `current_user` 是函数属主，这个判断对所有人都成立，会把全部校验跳过（五子棋开局触发器就踩过）。需要放行管理员时，用非 definer 的触发器。
+- Supabase 的默认权限会给 public schema 里每个新建函数授予 anon / authenticated 的 EXECUTE，所以只写 `revoke ... from public, anon` 不够。新增函数时：触发器函数要 `revoke execute ... from public, anon, authenticated`（触发时不检查 EXECUTE，照常工作）；给前端调用的 RPC 只撤 `public, anon`。被权限规则调用的 `is_member()` / `my_person()` 必须保留 authenticated 的 EXECUTE，Security Advisor 对它们和两个五子棋 RPC 的警告是预期内的。
 - 在 `onAuthStateChange` 回调里不要直接 await Supabase 调用（会锁死 auth），用 `setTimeout` 推迟。
 - 等级、连续天数、徽章、每周 Boss 都由 `game.js` 从打卡记录推算，不存数据库。加新玩法时保持这个做法：数据库只存服务器校验过的打卡，前端就没有可以篡改的分数。
 - 像素字体：字号只用 12 / 16 / 24px，其他尺寸在手机上会糊；没有粗体，强调靠颜色和字号。裁剪版字体只含源码里出现过的字，漏跑 `build:assets` 时缺的字会去下载 652KB 的完整字体，不会显示成方块，但会变慢。
