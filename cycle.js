@@ -17,6 +17,20 @@
     return periods;
   }
 
+  // A start–end range picked in the period sheet, expanded to days. Same limits as the period_days trigger
+  // (not in the future, not before 2020), plus a cap so a mistyped month can't mark half a year.
+  const MAX_RANGE = 15;
+  function rangeDays(start, end, today = new Date()) {
+    const isKey = (key) => typeof key === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(key) && Q.dateKey(toDate(key)) === key;
+    if (!isKey(start) || !isKey(end)) return { error:'请选择开始和结束日期' };
+    if (end < start) return { error:'结束日期不能早于开始日期' };
+    if (end > Q.dateKey(today)) return { error:'经期日期不能晚于今天' };
+    if (start < '2020-01-01') return { error:'日期需在 2020 年之后' };
+    const length = daysBetween(start, end) + 1;
+    if (length > MAX_RANGE) return { error:`一次最多标记 ${MAX_RANGE} 天` };
+    return { days:Array.from({ length }, (_, i) => { const d = toDate(start); return Q.dateKey(new Date(d.getFullYear(), d.getMonth(), d.getDate() + i)); }) };
+  }
+
   // What the records say about today: in a period (and which day of it), or when the last one was.
   function cycleSummary(dayKeys, today = new Date()) {
     const periods = periodsFromDays(dayKeys);
@@ -27,6 +41,6 @@
     return { status:'after', last };
   }
 
-  const api = { periodsFromDays, cycleSummary };
+  const api = { MAX_RANGE, periodsFromDays, rangeDays, cycleSummary };
   if (typeof module === 'object' && module.exports) module.exports = api; else root.QQLLCycle = api;
 })(this);
