@@ -55,6 +55,21 @@ test('only the importer\'s own records are imported; the partner\'s are counted 
   assert.equal(others, 2);
 });
 
+test('period days in a backup are parsed and validated; older backups without them still work', () => {
+  const text = JSON.stringify({ workouts:[row()], periods:[{ person:'Carol', date:'2026-10-01' }, { person:'Carol', date:'2026-10-10' }, { person:'Carol', date:'2026-13-01' }, { person:'Eve', date:'2026-10-01' }] });
+  const parsed = B.parseBackup(text, today);
+  assert.deepEqual(parsed.periods, [{ person:'Carol', date:'2026-10-01' }]);
+  assert.equal(parsed.invalid, 3);
+  assert.deepEqual(B.parseBackup(file([row()]), today).periods, []);
+});
+
+test('period import keeps only your own days and skips ones already marked', () => {
+  const plan = B.planPeriodImport([{ person:'Carol', date:'2026-10-01' }], [{ person:'Carol', date:'2026-10-01' }, { person:'Carol', date:'2026-10-02' }, { person:'Allen', date:'2026-10-02' }], 'Carol');
+  assert.deepEqual(plan.toInsert, [{ person:'Carol', date:'2026-10-02' }]);
+  assert.equal(plan.duplicates, 1);
+  assert.equal(plan.others, 1);
+});
+
 test('importing into an empty account inserts everything, and a second import inserts nothing', () => {
   const incoming = [row(), row({ person:'Allen' })];
   assert.equal(B.planImport([], incoming).toInsert.length, 2);

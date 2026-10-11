@@ -3,9 +3,12 @@
 select json_build_object(
   'exported_at', to_char(now() at time zone 'utc', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
   'source', 'auto-backup',
-  'workouts', coalesce(
-    json_agg(json_build_object('person', person, 'activity', activity, 'minutes', minutes, 'calories', calories, 'date', workout_date) order by workout_date, created_at),
-    '[]'::json
+  'workouts', (
+    select coalesce(json_agg(json_build_object('person', person, 'activity', activity, 'minutes', minutes, 'calories', calories, 'date', workout_date) order by workout_date, created_at), '[]'::json)
+    from public.workouts
+  ),
+  'periods', (
+    select coalesce(json_agg(json_build_object('person', person, 'date', period_date) order by period_date, person), '[]'::json)
+    from public.period_days
   )
-)
-from public.workouts;
+);

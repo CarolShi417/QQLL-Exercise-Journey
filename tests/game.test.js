@@ -52,6 +52,34 @@ test('streak and longest run survive month and year boundaries', () => {
   assert.deepEqual(G.streaks(new Set(), day(2026, 3, 1)), { current:0, longest:0 });
 });
 
+test('rest days (period) bridge a streak without counting as workouts', () => {
+  const days = new Set(['2026-10-01', '2026-10-02', '2026-10-06']);
+  const rest = new Set(['2026-10-03', '2026-10-04', '2026-10-05']);
+  assert.deepEqual(G.streaks(days, day(2026, 10, 6), rest), { current:3, longest:3 });
+  assert.deepEqual(G.streaks(days, day(2026, 10, 6)), { current:1, longest:2 });
+});
+
+test('a rest day today or yesterday keeps the streak alive', () => {
+  const days = new Set(['2026-10-08', '2026-10-09']);
+  assert.equal(G.streaks(days, day(2026, 10, 11), new Set(['2026-10-10', '2026-10-11'])).current, 2);
+  assert.equal(G.streaks(days, day(2026, 10, 11), new Set(['2026-10-10'])).current, 2);
+  assert.equal(G.streaks(days, day(2026, 10, 12), new Set(['2026-10-10'])).current, 0);
+});
+
+test('rest days alone never make a streak, and a workout on a rest day counts normally', () => {
+  assert.deepEqual(G.streaks(new Set(), day(2026, 10, 11), new Set(['2026-10-10', '2026-10-11'])), { current:0, longest:0 });
+  assert.deepEqual(G.streaks(new Set(['2026-10-10', '2026-10-11']), day(2026, 10, 11), new Set(['2026-10-10', '2026-10-11'])), { current:2, longest:2 });
+});
+
+test('personal streak badges honour rest days', () => {
+  const list = ['2026-10-01', '2026-10-02', '2026-10-03', '2026-10-07', '2026-10-08', '2026-10-09', '2026-10-10'].map((date) => ({ person:'Carol', activity:'跑步', calories:300, date }));
+  const rest = new Set(['2026-10-04', '2026-10-05', '2026-10-06']);
+  const withRest = Object.fromEntries(G.personalBadges(list, 'Carol', rest).map((badge) => [badge.id, badge]));
+  const without = Object.fromEntries(G.personalBadges(list, 'Carol').map((badge) => [badge.id, badge]));
+  assert.equal(withRest.streak7.unlocked, true);
+  assert.equal(without.streak7.unlocked, false);
+});
+
 test('person days and together days', () => {
   const list = [entry('Carol', '2026-10-05'), entry('Carol', '2026-10-05'), entry('Allen', '2026-10-05'), entry('Carol', '2026-10-06'), entry('Allen', '2026-10-07')];
   assert.deepEqual([...G.personDays(list, 'Carol')].sort(), ['2026-10-05', '2026-10-06']);
