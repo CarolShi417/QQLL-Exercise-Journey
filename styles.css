@@ -4,7 +4,7 @@
 /* font-faces:start */
 /* 生成文件：npm run build:assets。Fusion Pixel Font (OFL)，见 fonts/FusionPixel-OFL.txt */
 @font-face { font-family: "Fusion Pixel"; font-display: swap; src: url("fonts/fusion-pixel-12px-zh_hans.woff2") format("woff2"); }
-@font-face { font-family: "Fusion Pixel"; font-display: swap; src: url("fonts/fusion-pixel-12px-subset.woff2") format("woff2"); unicode-range: U+20-7e, U+b7, U+d7, U+f7, U+2013-2014, U+2026, U+2192, U+3001-3002, U+300a-300d, U+4e00, U+4e03, U+4e07, U+4e09-4e0b, U+4e0d, U+4e24, U+4e2a, U+4e2d, U+4e3a-4e3b, U+4e3d-4e3e, U+4e4b, U+4e58, U+4e5d, U+4e5f, U+4e86, U+4e8c, U+4e8e, U+4e91, U+4e94, U+4eba, U+4eca, U+4ee5, U+4eec, U+4ef6, U+4efd, U+4f0a, U+4f1a, U+4f20, U+4f24, U+4f38, U+4f3d, U+4f4d, U+4f53, U+4f59, U+4f60, U+4f7f, U+4fa0, U+4fdd, U+4fee, U+503c, U+5077, U+5148-5149, U+5165, U+5168, U+516b, U+516d, U+5171, U+5173, U+5176, U+518d, U+51fa-51fb, U+5206-5207, U+5217, U+521a, U+521d, U+5220, U+522b, U+5230, U+5237, U+523a, U+524d, U+5269-526a, U+529b, U+52a0, U+52a8, U+533b, U+5341, U+5347, U+5353, U+5355, U+5361, U+5370, U+5386, U+53ca, U+53cc, U+53d6, U+53ea, U+53ef, U+53f7, U+5408, U+540c-540e, U+5427, U+5438-5439, U+5458, U+5468, U+547d, U+548c, U+5492, U+54aa, U+55b5, U+55e8, U+5668, U+56db, U+56fe, U+5708, U+5728, U+5730, U+5740, U+575b, U+57ab, U+589e, U+58eb, U+5904, U+5907, U+5916, U+591a, U+591c, U+5927, U+5929, U+5931, U+5934, U+5947, U+5976, U+597d, U+59cb, U+5b50, U+5b58, U+5b66, U+5b88-5b89, U+5b8c, U+5b97, U+5ba0, U+5ba2, U+5bb3, U+5bc6, U+5bf9, U+5bfc, U+5c01, U+5c06, U+5c0f, U+5c18, U+5c1d, U+5c31, U+5c40, U+5c4b, U+5c4f, U+5c55, U+5de1, U+5de8, U+5df1-5df2, U+5e08, U+5e26, U+5e55, U+5e73-5e74, U+5e7d, U+5e95, U+5f00, U+5f0f, U+5f53, U+5f55, U+5f92, U+5f97, U+5fbd, U+6015, U+602a, U+6094, U+6210-6211, U+6216, U+6218, U+624b, U+624d, U+6253, U+62a4, U+62e9, U+62f3, U+6307, U+6309, U+6355, U+6362, U+63a5, U+6539, U+6548, U+654c, U+6574, U+6587, U+65b0, U+65b9, U+65e0, U+65e5, U+65e9, U+65f6, U+661f, U+662f, U+665a, U+66f4, U+6700, U+6708-6709, U+671f, U+672c, U+673a, U+6743, U+675f, U+6761, U+6765, U+679c, U+67b6, U+67d0, U+67e5, U+6807, U+683c, U+68c0, U+68cb, U+6b21, U+6b63, U+6b65-6b66, U+6bb5, U+6bcf, U+6c27, U+6c34, U+6ca1, U+6cd5, U+6cf3, U+6d17, U+6d41, U+6d45, U+6d88, U+6de1, U+6df1, U+6e38, U+6ee1, U+6fa1, U+706b, U+7075, U+7089, U+70b9, U+70ed, U+722c, U+7269, U+72ec, U+732b, U+738b, U+7406, U+745c, U+74dc, U+751f, U+7528, U+7531-7532, U+754c, U+75be, U+767b, U+767d-767e, U+7684, U+76c6, U+76d8, U+76ee, U+770b, U+7801, U+786e, U+795e, U+79cd, U+79f0, U+7a7a, U+7ae0, U+7aef, U+7b2c, U+7b49, U+7b50, U+7ba1, U+7bb1, U+7c89, U+7cae, U+7cfb, U+7d2f, U+7ea2, U+7ea7, U+7ec4, U+7ecf, U+7ed3, U+7ed8-7ed9, U+7edc, U+7edf, U+7ee7, U+7ee9, U+7eed, U+7f50-7f51, U+7f6e, U+8001, U+8005, U+8017, U+8054, U+8089, U+80dc, U+80f6, U+80fd, U+81ea, U+8272, U+838e, U+83b7, U+843d, U+884c, U+8981, U+89c2, U+89e3, U+8ba1, U+8ba4, U+8bb0, U+8bc5, U+8bf4, U+8bf7, U+8bfb, U+8c01, U+8d25-8d26, U+8d34, U+8d62, U+8d70, U+8d76-8d77, U+8d8a, U+8dd1, U+8ddf, U+8def, U+8df3, U+8f66, U+8f6e, U+8f7d, U+8f93, U+8fc7, U+8fd0-8fd1, U+8fd8-8fd9, U+8fde, U+8ffd, U+9000, U+9009, U+9020, U+9022, U+903b, U+90a3, U+90ae, U+90e8, U+90fd, U+9177, U+91cc-91cd, U+91cf, U+949f, U+94c1, U+9501, U+9519, U+957f, U+95ed, U+95f4, U+9650, U+9662, U+9664, U+968f, U+96e8, U+96f7, U+9700, U+9762, U+9875-9876, U+9879, U+9884, U+989c, U+98ce, U+9996, U+9a8c, U+9a91, U+9b54, U+9ec4, U+9f20, U+9f99, U+ff01, U+ff05, U+ff08-ff09, U+ff0c, U+ff1a-ff1b, U+ff1f; }
+@font-face { font-family: "Fusion Pixel"; font-display: swap; src: url("fonts/fusion-pixel-12px-subset.woff2") format("woff2"); unicode-range: U+20-7e, U+b7, U+d7, U+f7, U+2013-2014, U+2026, U+2192, U+3001-3002, U+300a-300d, U+4e00, U+4e03, U+4e07, U+4e09-4e0b, U+4e0d, U+4e24, U+4e2a, U+4e2d, U+4e3a-4e3b, U+4e3d-4e3e, U+4e4b, U+4e58, U+4e5d, U+4e5f, U+4e86, U+4e8c, U+4e8e, U+4e91, U+4e94, U+4eba, U+4eca, U+4ee5, U+4eec, U+4ef6, U+4efd, U+4f0a, U+4f1a, U+4f20, U+4f24, U+4f38, U+4f3d, U+4f4d, U+4f53, U+4f59, U+4f60, U+4f7f, U+4fa0, U+4fdd, U+4fee, U+503c, U+5077, U+5148-5149, U+5165, U+5168, U+516b, U+516d, U+5171, U+5173, U+5176, U+518d, U+51fa-51fb, U+5206-5207, U+5217, U+521a, U+521d, U+5220, U+522b, U+5230, U+5237, U+523a, U+524d, U+5269-526a, U+529b, U+52a0, U+52a8, U+533b, U+5341, U+5347, U+5353, U+5355, U+5361, U+5370, U+5386, U+53ca, U+53cc, U+53d6, U+53ea, U+53ef, U+53f7, U+5408, U+540c-540e, U+5427, U+5438-5439, U+5458, U+5468, U+547d, U+548c, U+5492, U+54aa, U+55b5, U+55e8, U+5668, U+56db, U+56fe, U+5708, U+5728, U+5730, U+573a, U+5740, U+575b, U+57ab, U+589e, U+58eb, U+5904, U+5907, U+5916, U+591a, U+591c, U+5927, U+5929, U+5931, U+5934, U+5947, U+5976, U+597d, U+59cb, U+5b50, U+5b58, U+5b66, U+5b88-5b89, U+5b8c, U+5b97, U+5ba0, U+5ba2, U+5bb3, U+5bc6, U+5bf9, U+5bfc, U+5c01, U+5c06, U+5c0f, U+5c18, U+5c1d, U+5c31, U+5c40, U+5c4b, U+5c4f, U+5c55, U+5de1, U+5de8, U+5df1-5df2, U+5e08, U+5e26, U+5e55, U+5e73-5e74, U+5e7d, U+5e95, U+5f00, U+5f0f, U+5f53, U+5f55, U+5f92, U+5f97, U+5fbd, U+6015, U+602a, U+6094, U+6210-6211, U+6216, U+6218, U+624b, U+624d, U+6253, U+62a4, U+62e9, U+62f3, U+6307, U+6309, U+6355, U+6362, U+63a5, U+6539, U+6548, U+654c, U+6574, U+6587, U+65b0, U+65b9, U+65e0, U+65e5, U+65e9, U+65f6, U+661f, U+662f, U+665a, U+666f, U+66f4, U+6700, U+6708-6709, U+671f, U+672c, U+673a, U+6743, U+675f, U+6761, U+6765, U+679c, U+67b6, U+67d0, U+67e5, U+6807, U+683c, U+68c0, U+68cb, U+6b21, U+6b63, U+6b65-6b66, U+6bb5, U+6bcf, U+6c27, U+6c34, U+6ca1, U+6cd5, U+6cf3, U+6d17, U+6d41, U+6d45, U+6d88, U+6de1, U+6df1, U+6e38, U+6ee1, U+6fa1, U+706b, U+7075, U+7089, U+70b9, U+70ed, U+722c, U+7269, U+72ec, U+732b, U+738b, U+7406, U+745c, U+74dc, U+751f, U+7528, U+7531-7532, U+754c, U+75be, U+767b, U+767d-767e, U+7684, U+76c6, U+76d8, U+76ee, U+770b, U+7801, U+786e, U+795e, U+79cd, U+79f0, U+7a7a, U+7ae0, U+7aef, U+7b2c, U+7b49, U+7b50, U+7ba1, U+7bb1, U+7c89, U+7cae, U+7cfb, U+7d2f, U+7ea2, U+7ea7, U+7ec4, U+7ecf, U+7ed3, U+7ed8-7ed9, U+7edc, U+7edf, U+7ee7, U+7ee9, U+7eed, U+7f50-7f51, U+7f6e, U+8001, U+8005, U+8017, U+8054, U+8089, U+80dc, U+80f6, U+80fd, U+81ea, U+8272, U+8349, U+838e, U+83b7, U+843d, U+884c, U+8981, U+89c2, U+89e3, U+8ba1, U+8ba4, U+8bb0, U+8bc5, U+8bf4, U+8bf7, U+8bfb, U+8c01, U+8d25-8d26, U+8d34, U+8d62, U+8d70, U+8d76-8d77, U+8d8a, U+8dd1, U+8ddf, U+8def, U+8df3, U+8f66, U+8f6e, U+8f7d, U+8f93, U+8fc7, U+8fd0-8fd1, U+8fd8-8fd9, U+8fde, U+8ffd, U+9000, U+9009, U+9020, U+9022, U+903b, U+90a3, U+90ae, U+90e8, U+90fd, U+9177, U+91cc-91cd, U+91cf, U+949f, U+94c1, U+9501, U+9519, U+957f, U+95ed, U+95f4, U+9650, U+9662, U+9664, U+968f, U+96e8, U+96ea, U+96f7, U+9700, U+9762, U+9875-9876, U+9879, U+9884, U+989c, U+98ce, U+9996, U+9a8c, U+9a91, U+9b54, U+9ec4, U+9f20, U+9f99, U+ff01, U+ff05, U+ff08-ff09, U+ff0c, U+ff1a-ff1b, U+ff1f; }
 /* font-faces:end */
 
 :root {
@@ -288,7 +288,23 @@ h1, h2, h3 { font-weight: normal; }
 .gomoku-status { min-height: 18px; margin: 10px 2px; color: var(--subtle); font-size: 12px; text-align: center; }
 .gomoku-status.is-mine { color: var(--brand); }
 /* 15×15 intersections. Each cell draws its own piece of the grid lines, trimmed at the board edge. */
-.gomoku-board { --grid-line: var(--subtle); display: grid; grid-template-columns: repeat(15, minmax(0, 1fr)); width: 100%; max-width: 480px; margin: 0 auto; padding: 4px; border-radius: 10px; background: var(--card-2); }
+.board-scene { width: fit-content; margin: 0 auto 10px; }
+/* Board scenes: the ground the cats walk on. Specks are tiny pixel dots so the surface reads as snow or grass. */
+.gomoku-board { display: grid; grid-template-columns: repeat(15, minmax(0, 1fr)); width: 100%; max-width: 480px; margin: 0 auto; padding: 4px; border: 2px solid var(--scene-edge); border-radius: 10px;
+  background-color: var(--scene-bg);
+  background-image: radial-gradient(var(--speck) 0.8px, transparent 1px), radial-gradient(var(--speck-2) 0.8px, transparent 1px);
+  background-size: 13px 13px, 19px 19px; background-position: 0 0, 6px 9px; }
+.gomoku-board.scene-snow {
+  --scene-bg: #eef5fb; --scene-edge: #c9d9e8; --speck: #ffffff; --speck-2: #d6e4f1; --grid-line: #b3c6d8; --star: #8fa6bd;
+  --rim-light: rgba(255, 255, 255, .95); --rim-dark: rgba(70, 95, 130, .38);
+  --carol-deep: #b4652f; --carol-mid: #e09a62; --carol-edge: #f7d6ba;
+  --allen-deep: #44607f; --allen-mid: #8aa3c1; --allen-edge: #d8e3ef; }
+.gomoku-board.scene-grass {
+  --scene-bg: #79b356; --scene-edge: #5a8f3d; --speck: #93c96d; --speck-2: #62983f; --grid-line: #4c7c34; --star: #3b6327;
+  --rim-light: rgba(210, 245, 175, .7); --rim-dark: rgba(25, 55, 12, .5);
+  --carol-deep: #7f3f12; --carol-mid: #c27434; --carol-edge: #e6ad74;
+  --allen-deep: #34506e; --allen-mid: #7f99b8; --allen-edge: #c6d6e8; }
+:root[data-theme="dark"] .gomoku-board { filter: brightness(.82) saturate(.9); }
 .gomoku-cell { position: relative; aspect-ratio: 1; padding: 0; border: 0; background:
     linear-gradient(var(--grid-line), var(--grid-line)) center / 100% 1px no-repeat,
     linear-gradient(var(--grid-line), var(--grid-line)) center / 1px 100% no-repeat; }
@@ -300,9 +316,20 @@ h1, h2, h3 { font-weight: normal; }
 .gomoku-cell.edge-r.edge-t { background-size: 50% 1px, 1px 50%; background-position: left center, center bottom; }
 .gomoku-cell.edge-l.edge-b { background-size: 50% 1px, 1px 50%; background-position: right center, center top; }
 .gomoku-cell.edge-r.edge-b { background-size: 50% 1px, 1px 50%; background-position: left center, center top; }
-.gomoku-cell.is-star::before { content: ""; position: absolute; inset: 40%; border-radius: 1px; background: var(--grid-line); }
-.stone { position: absolute; inset: 6%; z-index: 1; display: block; background: var(--accent); -webkit-mask: url("icons/pixel/paw.svg") center / contain no-repeat; mask: url("icons/pixel/paw.svg") center / contain no-repeat; }
-.stone.is-pending { opacity: .45; }
+.gomoku-cell.is-star::before { content: ""; position: absolute; inset: 40%; border-radius: 1px; background: var(--star); }
+/* A paw print pressed into the ground: the outer layer draws the rim (dark upper edge, light lower edge),
+   the inner masked layer shades the hollow from deep at the top to the surface colour at the bottom. */
+.print { position: absolute; inset: 8%; z-index: 1; display: block; filter: drop-shadow(0 1px 0 var(--rim-light)) drop-shadow(0 -1px 0 var(--rim-dark)); }
+.print .stone { position: absolute; inset: 0; display: block; background: linear-gradient(165deg, var(--deep) 0%, var(--mid) 58%, var(--edge) 100%); -webkit-mask: url("icons/pixel/paw.svg") center / contain no-repeat; mask: url("icons/pixel/paw.svg") center / contain no-repeat; }
+.print.is-carol { --deep: var(--carol-deep); --mid: var(--carol-mid); --edge: var(--carol-edge); }
+.print.is-allen { --deep: var(--allen-deep); --mid: var(--allen-mid); --edge: var(--allen-edge); }
+.print.is-pending { opacity: .5; filter: none; }
+.print.is-fresh { animation: paw-press .45s steps(5) both; }
+@keyframes paw-press {
+  0% { transform: translateY(-3px) scale(1.3); opacity: .3; filter: none; }
+  60% { transform: scale(.9); opacity: 1; }
+  100% { transform: none; }
+}
 .gomoku-cell.is-last::after, .gomoku-cell.is-win::after { content: ""; position: absolute; inset: 0; border-radius: 3px; box-shadow: inset 0 0 0 2px var(--brand); }
 .gomoku-cell.is-win::after { box-shadow: inset 0 0 0 2px var(--flame); background: color-mix(in srgb, var(--flame) 18%, transparent); }
 .gomoku-actions { display: grid; gap: 6px; margin-top: 12px; }

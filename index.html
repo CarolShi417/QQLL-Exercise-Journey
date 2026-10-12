@@ -117,7 +117,11 @@
         <div class="card gomoku-card">
           <div class="gomoku-players" id="gomokuPlayers"></div>
           <p class="gomoku-status" id="gomokuStatus"></p>
-          <div class="gomoku-board" id="gomokuBoard" role="grid" aria-label="五子棋棋盘，15 乘 15"></div>
+          <div class="segmented board-scene" role="group" aria-label="棋盘场景">
+            <button type="button" data-board-scene="snow">雪地</button>
+            <button type="button" data-board-scene="grass">草地</button>
+          </div>
+          <div class="gomoku-board scene-snow" id="gomokuBoard" role="grid" aria-label="五子棋棋盘，15 乘 15"></div>
           <div class="gomoku-actions">
             <button class="primary-button" id="gomokuPlace" type="button" hidden>落子</button>
             <button class="primary-button" id="gomokuNew" type="button" hidden><svg class="icon"><use href="#i-reload"/></svg>新开一局</button>
