@@ -30,6 +30,11 @@ let boardMoves = [];          // moves of the game on the board (the active one,
 let gomokuAvailable = false;  // false until the gomoku migration has been run
 let pendingCell = null;       // { x, y } picked but not yet confirmed
 let announcedGame = null;     // id of the last finished game we already announced
+let pressedMove = null;       // last move whose press animation already played, so re-renders don't replay it
+const BOARD_SCENES = ['snow', 'grass'];
+// Board scene is a per-device look preference, like the theme; it falls back to snow when storage is unavailable.
+function boardScene() { try { const value = localStorage.getItem('qqll-board-scene'); return BOARD_SCENES.includes(value) ? value : 'snow'; } catch { return 'snow'; } }
+function setBoardScene(scene) { try { localStorage.setItem('qqll-board-scene', scene); } catch { /* this visit only */ } renderBattle(); }
 
 function number(value) { return new Intl.NumberFormat('zh-CN').format(value); }
 function icon(name) { return `<svg class="icon" aria-hidden="true"><use href="#i-${name}"/></svg>`; }
@@ -375,11 +380,17 @@ function renderBattle() {
       const owner = stones.get(key);
       const pending = !owner && pendingCell && pendingCell.x === x && pendingCell.y === y;
       const classes = ['gomoku-cell', x === 0 ? 'edge-l' : '', x === K.SIZE - 1 ? 'edge-r' : '', y === 0 ? 'edge-t' : '', y === K.SIZE - 1 ? 'edge-b' : '', stars.has(key) ? 'is-star' : '', last && last.x === x && last.y === y ? 'is-last' : '', winning.has(key) ? 'is-win' : ''].filter(Boolean).join(' ');
-      const stone = owner ? `<i class="stone is-${owner.toLowerCase()}"></i>` : pending ? `<i class="stone is-pending is-${me.person.toLowerCase()}"></i>` : '';
+      const isLast = last && last.x === x && last.y === y;
+      const fresh = isLast && pressedMove !== `${game.id}:${last.moveNo}` ? ' is-fresh' : '';
+      const stone = owner ? `<i class="print is-${owner.toLowerCase()}${fresh}"><i class="stone"></i></i>` : pending ? `<i class="print is-pending is-${me.person.toLowerCase()}"><i class="stone"></i></i>` : '';
       html += `<button class="${classes}" type="button" data-x="${x}" data-y="${y}" aria-label="${x + 1} 列 ${y + 1} 行${owner ? `，${owner} 的子` : ''}">${stone}</button>`;
     }
   }
+  const scene = boardScene();
+  $('#gomokuBoard').className = `gomoku-board scene-${scene}`;
+  document.querySelectorAll('[data-board-scene]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.boardScene === scene)));
   $('#gomokuBoard').innerHTML = html;
+  if (last) pressedMove = `${game.id}:${last.moveNo}`;
   $('#gomokuPlace').hidden = !(myTurn && pendingCell);
   $('#gomokuNew').hidden = !(game?.status !== 'playing' && me);
   $('#gomokuSecondary').hidden = !(game?.status === 'playing' && me && (game.black === me.person || game.white === me.person));
@@ -687,6 +698,7 @@ function bindUi() {
   $('#gomokuNew').addEventListener('click', startGame);
   $('#gomokuResign').addEventListener('click', resignGame);
   $('#gomokuUndo').addEventListener('click', undoMove);
+  document.querySelectorAll('[data-board-scene]').forEach((button) => button.addEventListener('click', () => setBoardScene(button.dataset.boardScene)));
   $('#periodForm').addEventListener('submit', savePeriodRange);
   $('#periodUnmark').addEventListener('click', clearPeriodRange);
   $('#closePeriod').addEventListener('click', () => $('#periodDialog').close());
