@@ -289,25 +289,57 @@ h1, h2, h3 { font-weight: normal; }
 .gomoku-status.is-mine { color: var(--brand); }
 /* 15×15 intersections. Each cell draws its own piece of the grid lines, trimmed at the board edge. */
 .board-scene { width: fit-content; margin: 0 auto 10px; }
-/* Board scenes: the ground the cats walk on. Specks are tiny pixel dots so the surface reads as snow or grass. */
-.gomoku-board { display: grid; grid-template-columns: repeat(15, minmax(0, 1fr)); width: 100%; max-width: 480px; margin: 0 auto; padding: 4px; border: 2px solid var(--scene-edge); border-radius: 10px;
-  background-color: var(--scene-bg);
-  background-image: radial-gradient(var(--speck) 0.8px, transparent 1px), radial-gradient(var(--speck-2) 0.8px, transparent 1px);
-  background-size: 13px 13px, 19px 19px; background-position: 0 0, 6px 9px; }
+/* Board scenes: tactile snow & grass terrain with bevel frame and natural ground depth. */
+.gomoku-board { display: grid; grid-template-columns: repeat(15, minmax(0, 1fr)); width: 100%; max-width: 480px; margin: 0 auto; padding: 5px; border-radius: 12px; position: relative; user-select: none; }
 .gomoku-board.scene-snow {
-  --scene-bg: #eef5fb; --scene-edge: #c9d9e8; --speck: #ffffff; --speck-2: #d6e4f1; --grid-line: #b3c6d8; --star: #8fa6bd;
-  --rim-light: #ffffff; --rim-dark: rgba(55, 80, 115, .55);
-  --carol-deep: #7e3f17; --carol-shade: #b9692f; --carol-mid: #e29a5f; --carol-edge: #f6d2b0;
-  --allen-deep: #2f4663; --allen-shade: #56708f; --allen-mid: #8ea7c4; --allen-edge: #d6e1ee; }
+  --scene-bg: #eef5fc; --scene-edge: #b5cde3; --grid-line: #a4bed6; --star: #5b82a6;
+  --pit-bg: rgba(182, 208, 232, 0.45); --pit-inner-shadow: rgba(35, 66, 102, 0.42); --pit-outer-shadow: rgba(30, 58, 90, 0.38);
+  --rim-light: rgba(255, 255, 255, 0.95);
+  --carol-deep: #652f0b; --carol-shade: #a6541c; --carol-mid: #d98846; --carol-edge: #fce1cb;
+  --allen-deep: #19304a; --allen-shade: #3f5b7c; --allen-mid: #7897bc; --allen-edge: #dae6f5;
+  background-color: var(--scene-bg);
+  background-image:
+    radial-gradient(circle, #ffffff 1.2px, transparent 1.6px),
+    radial-gradient(circle, rgba(185, 212, 236, 0.75) 1px, transparent 1.4px),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.45) 0%, rgba(215, 233, 248, 0.25) 100%);
+  background-size: 15px 15px, 23px 23px, 100% 100%; background-position: 0 0, 7px 11px, 0 0;
+  border: 3px solid var(--scene-edge);
+  box-shadow: 0 8px 20px rgba(35, 65, 100, 0.12), 0 2px 4px rgba(35, 65, 100, 0.08), inset 0 2px 0 rgba(255, 255, 255, 0.95), inset 0 -2px 0 rgba(165, 192, 218, 0.5); }
 .gomoku-board.scene-grass {
-  --scene-bg: #79b356; --scene-edge: #5a8f3d; --speck: #93c96d; --speck-2: #62983f; --grid-line: #4c7c34; --star: #3b6327;
-  --rim-light: rgba(205, 245, 165, .85); --rim-dark: rgba(20, 48, 8, .65);
-  --carol-deep: #4f2306; --carol-shade: #8d4a19; --carol-mid: #c77a37; --carol-edge: #e9b27a;
-  --allen-deep: #1f344d; --allen-shade: #4a6582; --allen-mid: #86a0bf; --allen-edge: #cbdaeb; }
-:root[data-theme="dark"] .gomoku-board { filter: brightness(.82) saturate(.9); }
+  --scene-bg: #67a641; --scene-edge: #427825; --grid-line: #3b6620; --star: #254412;
+  --pit-bg: rgba(26, 54, 12, 0.42); --pit-inner-shadow: rgba(14, 34, 6, 0.55); --pit-outer-shadow: rgba(10, 26, 4, 0.62);
+  --rim-light: rgba(215, 255, 160, 0.85);
+  --carol-deep: #3f1802; --carol-shade: #76370e; --carol-mid: #b46524; --carol-edge: #f5cca0;
+  --allen-deep: #122438; --allen-shade: #324c68; --allen-mid: #6c8aa5; --allen-edge: #c7dbf8;
+  background-color: var(--scene-bg);
+  background-image:
+    radial-gradient(circle, #8ad056 1.2px, transparent 1.6px),
+    radial-gradient(circle, #4d862c 1.2px, transparent 1.5px),
+    linear-gradient(135deg, rgba(145, 220, 90, 0.22) 0%, rgba(65, 120, 35, 0.18) 100%);
+  background-size: 14px 14px, 21px 21px, 100% 100%; background-position: 0 0, 7px 10px, 0 0;
+  border: 3px solid var(--scene-edge);
+  box-shadow: 0 8px 20px rgba(18, 42, 8, 0.2), 0 2px 4px rgba(18, 42, 8, 0.12), inset 0 2px 0 rgba(215, 255, 160, 0.7), inset 0 -2px 0 rgba(32, 60, 16, 0.55); }
+[data-theme="dark"] .gomoku-board.scene-snow {
+  --scene-bg: #222c38; --scene-edge: #384b5e; --grid-line: #3d5369; --star: #7093b5;
+  --pit-bg: rgba(12, 18, 26, 0.65); --pit-inner-shadow: rgba(0, 0, 0, 0.7); --pit-outer-shadow: rgba(0, 0, 0, 0.65);
+  --rim-light: rgba(145, 185, 220, 0.4);
+  --carol-deep: #4d2307; --carol-shade: #8f4614; --carol-mid: #c47638; --carol-edge: #e6b38c;
+  --allen-deep: #142436; --allen-shade: #2d4561; --allen-mid: #5b799c; --allen-edge: #adc2de;
+  background-image: radial-gradient(circle, rgba(200, 225, 255, 0.5) 1px, transparent 1.5px), radial-gradient(circle, rgba(120, 150, 180, 0.3) 1px, transparent 1.4px), linear-gradient(135deg, rgba(45, 60, 78, 0.4) 0%, rgba(20, 30, 42, 0.4) 100%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.25), inset 0 2px 0 rgba(145, 185, 225, 0.3), inset 0 -2px 0 rgba(15, 24, 34, 0.7); }
+[data-theme="dark"] .gomoku-board.scene-grass {
+  --scene-bg: #243d1a; --scene-edge: #355726; --grid-line: #2d4c20; --star: #568541;
+  --pit-bg: rgba(8, 16, 6, 0.65); --pit-inner-shadow: rgba(0, 0, 0, 0.75); --pit-outer-shadow: rgba(0, 0, 0, 0.7);
+  --rim-light: rgba(155, 210, 120, 0.35);
+  --carol-deep: #3b1602; --carol-shade: #75350c; --carol-mid: #aa5c1e; --carol-edge: #d89f72;
+  --allen-deep: #0f1d2c; --allen-shade: #273e56; --allen-mid: #506d8a; --allen-edge: #9cb5cf;
+  background-image: radial-gradient(circle, rgba(120, 180, 80, 0.4) 1px, transparent 1.5px), radial-gradient(circle, rgba(60, 100, 40, 0.4) 1px, transparent 1.4px), linear-gradient(135deg, rgba(40, 70, 30, 0.3) 0%, rgba(18, 32, 12, 0.4) 100%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.3), inset 0 2px 0 rgba(155, 210, 120, 0.25), inset 0 -2px 0 rgba(10, 20, 7, 0.8); }
 .gomoku-cell { position: relative; aspect-ratio: 1; padding: 0; border: 0; background:
     linear-gradient(var(--grid-line), var(--grid-line)) center / 100% 1px no-repeat,
-    linear-gradient(var(--grid-line), var(--grid-line)) center / 1px 100% no-repeat; }
+    linear-gradient(var(--grid-line), var(--grid-line)) center / 1px 100% no-repeat;
+  cursor: pointer; border-radius: 4px; }
+@media (hover: hover) { .gomoku-cell:not(.has-stone):not(.has-pending):hover { background-color: rgba(255, 255, 255, 0.16); } }
 .gomoku-cell.edge-l { background-size: 50% 1px, 1px 100%; background-position: right center, center; }
 .gomoku-cell.edge-r { background-size: 50% 1px, 1px 100%; background-position: left center, center; }
 .gomoku-cell.edge-t { background-size: 100% 1px, 1px 50%; background-position: center, center bottom; }
@@ -316,28 +348,40 @@ h1, h2, h3 { font-weight: normal; }
 .gomoku-cell.edge-r.edge-t { background-size: 50% 1px, 1px 50%; background-position: left center, center bottom; }
 .gomoku-cell.edge-l.edge-b { background-size: 50% 1px, 1px 50%; background-position: right center, center top; }
 .gomoku-cell.edge-r.edge-b { background-size: 50% 1px, 1px 50%; background-position: left center, center top; }
-.gomoku-cell.is-star::before { content: ""; position: absolute; inset: 40%; border-radius: 1px; background: var(--star); }
-/* A paw print pressed into the ground, lit from above. The hollow is the paw shape filled with the darkest
-   shadow; two copies of the paw shifted down (and clipped by the hollow's mask) paint a half-shadow band and
-   then the lit floor, so every toe gets the shadow of its upper wall — stepped like pixel-art shading.
-   The rim is a drop-shadow on the unmasked wrapper (on the masked element it would be clipped away):
-   darker above, a thick bright lip of pushed-up snow / grass below. */
-.print { position: absolute; inset: 4%; z-index: 1; display: block; filter: drop-shadow(0 -1px 0 var(--rim-dark)) drop-shadow(0 1.5px 0 var(--rim-light)) drop-shadow(0 1px 1px var(--rim-light)); }
+.gomoku-cell.is-star::before { content: ""; position: absolute; inset: 38%; border-radius: 1px; background: var(--star); box-shadow: 0 1px 0 var(--rim-light); }
+/* Sunken indentation pit pressed into the ground by the cat's paw. */
+.pit { position: absolute; inset: 1px; border-radius: 50%; pointer-events: none; z-index: 1;
+  background: radial-gradient(circle at 50% 36%, var(--pit-bg) 0%, rgba(0, 0, 0, 0.04) 55%, transparent 75%);
+  box-shadow: inset 0 2.5px 3px var(--pit-inner-shadow), inset 0 1px 1px var(--pit-outer-shadow), 0 1.5px 1px var(--rim-light); }
+.pit.is-pending { opacity: .55; box-shadow: inset 0 1.5px 2px var(--pit-inner-shadow), 0 1px 0 var(--rim-light); }
+.pit.is-fresh { animation: pit-press .45s steps(5) both; }
+@keyframes pit-press {
+  0% { transform: scale(.7); opacity: 0; }
+  60% { transform: scale(1.05); opacity: 1; }
+  100% { transform: none; }
+}
+/* A paw print pressed deep into the pit, lit from above with shadow falling into the depression. */
+.print { position: absolute; inset: 3%; z-index: 2; display: block; pointer-events: none;
+  filter: drop-shadow(0 2.5px 2px var(--pit-outer-shadow)) drop-shadow(0 1px 0 var(--rim-light)); }
 .print .stone, .print .stone::before, .print .stone::after { position: absolute; inset: 0; display: block; -webkit-mask: url("icons/pixel/paw.svg") center / contain no-repeat; mask: url("icons/pixel/paw.svg") center / contain no-repeat; }
 .print .stone { background: var(--deep); }
-.print .stone::before { content: ""; background: var(--shade); transform: translateY(10%); }
-.print .stone::after { content: ""; background: linear-gradient(180deg, var(--mid), var(--edge)); transform: translateY(20%); }
+.print .stone::before { content: ""; background: var(--shade); transform: translateY(12%); }
+.print .stone::after { content: ""; background: linear-gradient(180deg, var(--mid) 0%, var(--edge) 100%); transform: translateY(24%); }
 .print.is-carol { --deep: var(--carol-deep); --shade: var(--carol-shade); --mid: var(--carol-mid); --edge: var(--carol-edge); }
 .print.is-allen { --deep: var(--allen-deep); --shade: var(--allen-shade); --mid: var(--allen-mid); --edge: var(--allen-edge); }
-.print.is-pending { opacity: .5; filter: none; }
+.print.is-pending { opacity: .5; filter: drop-shadow(0 1px 1px var(--pit-outer-shadow)); }
 .print.is-fresh { animation: paw-press .45s steps(5) both; }
 @keyframes paw-press {
   0% { transform: translateY(-3px) scale(1.3); opacity: .3; filter: none; }
-  60% { transform: scale(.9); opacity: 1; }
+  60% { transform: scale(.92); opacity: 1; }
   100% { transform: none; }
 }
-.gomoku-cell.is-last::after, .gomoku-cell.is-win::after { content: ""; position: absolute; inset: 0; border-radius: 3px; box-shadow: inset 0 0 0 2px var(--brand); }
-.gomoku-cell.is-win::after { box-shadow: inset 0 0 0 2px var(--flame); background: color-mix(in srgb, var(--flame) 18%, transparent); }
+.gomoku-cell.is-last::after, .gomoku-cell.is-win::after { content: ""; position: absolute; inset: 0; border-radius: 5px; box-shadow: inset 0 0 0 2px var(--brand), 0 0 6px rgba(122, 104, 240, 0.45); pointer-events: none; z-index: 3; }
+.gomoku-cell.is-win::after { box-shadow: inset 0 0 0 2px var(--flame), 0 0 8px rgba(240, 140, 43, 0.6); background: color-mix(in srgb, var(--flame) 20%, transparent); animation: win-pulse 1.2s ease-in-out infinite alternate; }
+@keyframes win-pulse {
+  0% { box-shadow: inset 0 0 0 2px var(--flame), 0 0 4px rgba(240, 140, 43, 0.4); }
+  100% { box-shadow: inset 0 0 0 2px #ffaf6e, 0 0 10px rgba(240, 140, 43, 0.8); }
+}
 .gomoku-actions { display: grid; gap: 6px; margin-top: 12px; }
 .gomoku-actions .primary-button { display: flex; align-items: center; justify-content: center; gap: 8px; }
 .gomoku-actions [hidden] { display: none; }

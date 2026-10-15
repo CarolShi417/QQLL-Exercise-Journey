@@ -379,10 +379,10 @@ function renderBattle() {
       const key = `${x},${y}`;
       const owner = stones.get(key);
       const pending = !owner && pendingCell && pendingCell.x === x && pendingCell.y === y;
-      const classes = ['gomoku-cell', x === 0 ? 'edge-l' : '', x === K.SIZE - 1 ? 'edge-r' : '', y === 0 ? 'edge-t' : '', y === K.SIZE - 1 ? 'edge-b' : '', stars.has(key) ? 'is-star' : '', last && last.x === x && last.y === y ? 'is-last' : '', winning.has(key) ? 'is-win' : ''].filter(Boolean).join(' ');
+      const classes = ['gomoku-cell', x === 0 ? 'edge-l' : '', x === K.SIZE - 1 ? 'edge-r' : '', y === 0 ? 'edge-t' : '', y === K.SIZE - 1 ? 'edge-b' : '', stars.has(key) ? 'is-star' : '', last && last.x === x && last.y === y ? 'is-last' : '', winning.has(key) ? 'is-win' : '', owner ? 'has-stone' : '', pending ? 'has-pending' : ''].filter(Boolean).join(' ');
       const isLast = last && last.x === x && last.y === y;
       const fresh = isLast && pressedMove !== `${game.id}:${last.moveNo}` ? ' is-fresh' : '';
-      const stone = owner ? `<i class="print is-${owner.toLowerCase()}${fresh}"><i class="stone"></i></i>` : pending ? `<i class="print is-pending is-${me.person.toLowerCase()}"><i class="stone"></i></i>` : '';
+      const stone = owner ? `<i class="pit${fresh}"></i><i class="print is-${owner.toLowerCase()}${fresh}"><i class="stone"></i></i>` : pending ? `<i class="pit is-pending"></i><i class="print is-pending is-${me.person.toLowerCase()}"><i class="stone"></i></i>` : '';
       html += `<button class="${classes}" type="button" data-x="${x}" data-y="${y}" aria-label="${x + 1} 列 ${y + 1} 行${owner ? `，${owner} 的子` : ''}">${stone}</button>`;
     }
   }
