@@ -44,6 +44,8 @@ test('unknown person values render as a neutral label instead of crashing', () =
 test('calories, XP and levels', () => {
   assert.equal(Q.calculateCalories('跑步', 30), 300);
   assert.equal(Q.calculateCalories('瑜伽', 31), 109);
+  assert.equal(Q.calculateCalories('徒步平地', 30), 135);
+  assert.equal(Q.calculateCalories('徒步山地', 30), 225);
   assert.equal(Q.calculateCalories('未知', 30), 0);
   assert.equal(Q.currentLevel(0).level, 0);
   assert.equal(Q.currentLevel(99.9).level, 0);

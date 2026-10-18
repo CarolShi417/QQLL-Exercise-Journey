@@ -72,9 +72,11 @@ begin
 
   v_rate := case new.activity
     when '瑜伽' then 3.5
+    when '徒步平地' then 4.5
     when '无氧/力量' then 6
-    when '游泳' then 8
     when '骑行' then 7
+    when '徒步山地' then 7.5
+    when '游泳' then 8
     when '跑步' then 10
   end;
   if v_rate is null then
