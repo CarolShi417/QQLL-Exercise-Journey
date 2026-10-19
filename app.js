@@ -246,7 +246,6 @@ function renderHome() {
   }));
   Q.PEOPLE.forEach((person) => {
     const activeDays = G.personDays(entries, person);
-    const cycle = cycleFor(person);
     cards.push(habitCardHtml({
       scope:`is-${person.toLowerCase()}`, tile:Q.catHtml(person), checkin:me?.person === person ? person : null,
       title:`${person} <em>${personTitle(person)}</em>`,
@@ -260,7 +259,6 @@ function renderHome() {
       }).join(''),
       streak:G.streaks(activeDays, today, restDays(person)), streakLabel:'连续',
     }));
-    if (person === CYCLE_PERSON && periodsAvailable) cards.push(cycleCardHtml(cycle));
   });
   const host = $('#habitList');
   host.innerHTML = cards.join('');
@@ -289,6 +287,13 @@ function renderCalendar() {
     html += `<button class="${classes}" data-date="${key}" type="button" aria-label="${key}"><span class="day-number">${date.getDate()}</span><span class="day-pixels">${minis}</span></button>`;
   }
   $('#calendar').innerHTML = html;
+  renderCycleCard();
+}
+function renderCycleCard() {
+  const host = $('#cycleCard');
+  if (!host) return;
+  if (!periodsAvailable) { host.innerHTML = ''; return; }
+  host.innerHTML = cycleCardHtml(cycleFor(CYCLE_PERSON));
 }
 function renderDayRecords() {
   const host = $('#dayRecords');
@@ -679,12 +684,14 @@ function bindUi() {
   $('#themeToggle').addEventListener('click', toggleTheme);
   $('#closeCheckin').addEventListener('click', () => $('#checkinDialog').close());
   $('#habitList').addEventListener('click', (event) => {
-    if (event.target.closest('[data-period-open]')) { openPeriodSheet(); return; }
     const checkin = event.target.closest('[data-checkin]');
     if (checkin) { openCheckin(); return; }
     const pixel = event.target.closest('[data-date]');
     if (pixel) { openCalendarAt(pixel.dataset.date); return; }
     if (event.target.closest('[data-open-calendar]')) showView('records');
+  });
+  $('#records').addEventListener('click', (event) => {
+    if (event.target.closest('[data-period-open]')) { openPeriodSheet(); }
   });
   $('#calendar').addEventListener('click', (event) => { const day = event.target.closest('[data-date]'); if (!day) return; selectedDate = day.dataset.date; renderCalendar(); renderDayRecords(); });
   $('#dayRecords').addEventListener('click', (event) => {

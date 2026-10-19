@@ -231,6 +231,7 @@ h1, h2, h3 { font-weight: normal; }
 .period-row .link-button { padding: 8px 10px; font-size: 12px; color: var(--period-ink); }
 
 /* ---------- period card ---------- */
+#cycleCard:not(:empty) { margin-top: 16px; }
 .cycle-card { --tile: var(--period-tile); --tile-ink: var(--period); }
 .cycle-card .habit-head { margin-bottom: 12px; }
 .cycle-note { margin: 8px 0 0; color: var(--subtle); font-size: 12px; text-align: center; }
