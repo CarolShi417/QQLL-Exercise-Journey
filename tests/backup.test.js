@@ -7,11 +7,12 @@ const row = (overrides = {}) => ({ person:'Carol', activity:'跑步', minutes:30
 const file = (workouts) => JSON.stringify({ exported_at:'2026-10-09T00:00:00Z', workouts });
 
 test('a backup exported by the app parses back into records', () => {
-  const { records, invalid } = B.parseBackup(file([row(), row({ person:'Allen', activity:'游泳', minutes:45, date:'2026-10-02' })]), today);
+  const { records, invalid } = B.parseBackup(file([row(), row({ person:'Allen', activity:'游泳', minutes:45, date:'2026-10-02' }), row({ person:'Carol', activity:'徒步山地', minutes:60, date:'2026-10-03' })]), today);
   assert.equal(invalid, 0);
   assert.deepEqual(records, [
     { person:'Carol', activity:'跑步', minutes:30, date:'2026-10-01' },
     { person:'Allen', activity:'游泳', minutes:45, date:'2026-10-02' },
+    { person:'Carol', activity:'徒步山地', minutes:60, date:'2026-10-03' },
   ]);
 });
 

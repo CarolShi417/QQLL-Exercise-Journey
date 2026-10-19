@@ -1,7 +1,7 @@
 // Pure helpers shared by the page (window.QQLL) and the Node tests (require).
 // CALORIE_RATES must stay in sync with workouts_before_write() in supabase/migrations.
 (function (root) {
-  const CALORIE_RATES = { '瑜伽':3.5, '无氧/力量':6, '游泳':8, '骑行':7, '跑步':10 };
+  const CALORIE_RATES = { '瑜伽':3.5, '徒步平地':4.5, '无氧/力量':6, '骑行':7, '徒步山地':7.5, '游泳':8, '跑步':10 };
   const PEOPLE = ['Carol', 'Allen'];
   const HTML_ESCAPES = { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' };
 
