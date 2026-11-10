@@ -24,7 +24,6 @@
     const isKey = (key) => typeof key === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(key) && Q.dateKey(toDate(key)) === key;
     if (!isKey(start) || !isKey(end)) return { error:'请选择开始和结束日期' };
     if (end < start) return { error:'结束日期不能早于开始日期' };
-    if (end > Q.dateKey(today)) return { error:'经期日期不能晚于今天' };
     if (start < '2020-01-01') return { error:'日期需在 2020 年之后' };
     const length = daysBetween(start, end) + 1;
     if (length > MAX_RANGE) return { error:`一次最多标记 ${MAX_RANGE} 天` };
@@ -36,9 +35,13 @@
     const periods = periodsFromDays(dayKeys);
     if (!periods.length) return { status:'none' };
     const todayKey = Q.dateKey(today);
-    const last = periods[periods.length - 1];
-    if (dayKeys.includes(todayKey)) return { status:'in', dayOfPeriod:daysBetween(last.start, todayKey) + 1, current:last };
-    return { status:'after', last };
+    const current = periods.find((p) => todayKey >= p.start && todayKey <= p.end);
+    if (current) return { status:'in', dayOfPeriod:daysBetween(current.start, todayKey) + 1, current };
+    const past = periods.filter((p) => p.end < todayKey);
+    const future = periods.filter((p) => p.start > todayKey);
+    if (past.length) return { status:'after', last:past[past.length - 1], ...(future.length ? { future:future[0] } : {}) };
+    if (future.length) return { status:'future', future:future[0] };
+    return { status:'none' };
   }
 
   const api = { MAX_RANGE, periodsFromDays, rangeDays, cycleSummary };

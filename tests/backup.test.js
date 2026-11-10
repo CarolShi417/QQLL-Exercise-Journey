@@ -59,8 +59,8 @@ test('only the importer\'s own records are imported; the partner\'s are counted 
 test('period days in a backup are parsed and validated; older backups without them still work', () => {
   const text = JSON.stringify({ workouts:[row()], periods:[{ person:'Carol', date:'2026-10-01' }, { person:'Carol', date:'2026-10-10' }, { person:'Carol', date:'2026-13-01' }, { person:'Eve', date:'2026-10-01' }] });
   const parsed = B.parseBackup(text, today);
-  assert.deepEqual(parsed.periods, [{ person:'Carol', date:'2026-10-01' }]);
-  assert.equal(parsed.invalid, 3);
+  assert.deepEqual(parsed.periods, [{ person:'Carol', date:'2026-10-01' }, { person:'Carol', date:'2026-10-10' }]);
+  assert.equal(parsed.invalid, 2);
   assert.deepEqual(B.parseBackup(file([row()]), today).periods, []);
 });
 
