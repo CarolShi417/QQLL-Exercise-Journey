@@ -9,13 +9,11 @@ create table if not exists public.period_days (
   primary key (person, period_date)
 );
 
--- 写入前：只能标记自己的、不能标未来的日子；SQL Editor（管理员）恢复数据不受限
+-- 写入前：只能标记自己的、不早于 2020 年；SQL Editor（管理员）恢复数据不受限
 create or replace function public.period_days_before_insert()
 returns trigger
 language plpgsql set search_path = ''
 as $$
-declare
-  v_today date := (now() at time zone 'Asia/Shanghai')::date;
 begin
   if current_user not in ('authenticated', 'anon') then
     return new;
@@ -26,8 +24,8 @@ begin
   if new.person is distinct from public.my_person() then
     raise exception '只能标记自己的经期';
   end if;
-  if new.period_date is null or new.period_date > v_today or new.period_date < date '2020-01-01' then
-    raise exception '经期日期不能晚于今天';
+  if new.period_date is null or new.period_date < date '2020-01-01' then
+    raise exception '经期日期需在 2020 年之后';
   end if;
   new.created_by := auth.uid();
   new.created_at := now();

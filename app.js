@@ -131,6 +131,7 @@ function cycleCardHtml(cycle) {
     none:'还没有记录',
     in:`经期第 ${cycle.dayOfPeriod} 天`,
     after:cycle.last ? `上次经期 ${shortDate(cycle.last.start)}${cycle.last.length > 1 ? `–${shortDate(cycle.last.end)}` : ''}，共 ${cycle.last.length} 天` : '',
+    future:cycle.future ? `预估经期 ${shortDate(cycle.future.start)}${cycle.future.length > 1 ? `–${shortDate(cycle.future.end)}` : ''}，共 ${cycle.future.length} 天` : '',
   }[cycle.status];
   const action = mine
     ? '<button class="primary-button is-period" type="button" data-period-open>记录经期</button>'
@@ -154,7 +155,8 @@ function openPeriodSheet() {
   const cycle = cycleFor(CYCLE_PERSON);
   $('#periodStart').value = cycle.status === 'in' ? cycle.current.start : todayKey;
   $('#periodEnd').value = todayKey;
-  $('#periodStart').max = todayKey; $('#periodEnd').max = todayKey;
+  $('#periodStart').min = '2020-01-01'; $('#periodEnd').min = '2020-01-01';
+  $('#periodStart').removeAttribute('max'); $('#periodEnd').removeAttribute('max');
   updatePeriodSummary(); $('#periodDialog').showModal();
 }
 async function savePeriodRange(event) {
@@ -308,7 +310,7 @@ function periodRowHtml(key) {
   if (!periodsAvailable) return '';
   const dayNumber = periodDayNumber(CYCLE_PERSON, key);
   const text = dayNumber ? `${CYCLE_PERSON} 经期第 ${dayNumber} 天` : '';
-  const canToggle = me?.person === CYCLE_PERSON && key <= Q.dateKey(new Date());
+  const canToggle = me?.person === CYCLE_PERSON && key >= '2020-01-01';
   if (!text && !canToggle) return '';
   const toggle = canToggle ? `<button class="link-button" type="button" data-period-toggle="${key}">${dayNumber ? '取消经期标记' : '标记为经期'}</button>` : '';
   return `<div class="period-row${dayNumber ? ' is-marked' : ''}"><span>${icon('paw')}${text || '不在经期'}</span>${toggle}</div>`;

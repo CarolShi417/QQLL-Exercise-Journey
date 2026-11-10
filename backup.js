@@ -17,9 +17,9 @@
     return { person, activity, minutes, date };
   }
 
-  function validPeriod(row, todayKey) {
+  function validPeriod(row) {
     if (!row || typeof row !== 'object' || !Q.PEOPLE.includes(row.person) || typeof row.date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(row.date)) return null;
-    if (Q.dateKey(new Date(`${row.date}T00:00:00`)) !== row.date || row.date < EARLIEST || row.date > todayKey) return null;
+    if (Q.dateKey(new Date(`${row.date}T00:00:00`)) !== row.date || row.date < EARLIEST) return null;
     return { person:row.person, date:row.date };
   }
 
@@ -31,7 +31,7 @@
     const records = []; let invalid = 0;
     data.workouts.forEach((row) => { const record = validRecord(row, todayKey); if (record) records.push(record); else invalid += 1; });
     const periods = [];
-    (Array.isArray(data.periods) ? data.periods : []).forEach((row) => { const period = validPeriod(row, todayKey); if (period) periods.push(period); else invalid += 1; });
+    (Array.isArray(data.periods) ? data.periods : []).forEach((row) => { const period = validPeriod(row); if (period) periods.push(period); else invalid += 1; });
     return { records, periods, invalid };
   }
 
